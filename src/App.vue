@@ -1,30 +1,23 @@
 <template>
   <div id="app" v-cloak>
+    <TitleBar />
     <router-view />
   </div>
 </template>
 
-<script>
+<script setup>
 import { onMounted } from 'vue'
+import TitleBar from './components/TitleBar.vue'
 
-export default {
-  name: 'App',
-  setup() {
-    onMounted(() => {
-      initParticleBackground()
-    })
-
-    function initParticleBackground() {
-      const canvas = document.getElementById('particle-canvas')
-      if (canvas) {
-        canvas.style.position = 'fixed'
-        canvas.style.top = '0'
-        canvas.style.left = '0'
-        canvas.style.zIndex = '-1'
-      }
-    }
+onMounted(() => {
+  const canvas = document.getElementById('particle-canvas')
+  if (canvas) {
+    canvas.style.position = 'fixed'
+    canvas.style.top = '0'
+    canvas.style.left = '0'
+    canvas.style.zIndex = '-1'
   }
-}
+})
 </script>
 
 <style>

@@ -5,38 +5,18 @@
       <div class="header-content">
         <h1 class="app-title">
           <i class="fas fa-shield-alt" />
-          漏洞扫描系统
+          VulMind
         </h1>
-        <p class="app-subtitle">
-          基于 Vue.js 构建的企业级安全扫描平台 - 全面保障您的网络安全
-        </p>
+        <p class="app-subtitle">可拓展大模型漏洞扫描平台</p>
       </div>
-
-      <!-- 顶部导航按钮 -->
-      <nav class="nav-buttons">
-        <router-link to="/dashboard" class="nav-button">
-          <i class="fas fa-home" /> 主页
-        </router-link>
-        <router-link to="/scan-history" class="nav-button">
-          <i class="fas fa-history" /> 扫描历史
-        </router-link>
-        <router-link to="/report-templates" class="nav-button">
-          <i class="fas fa-file-alt" /> 报告模板
-        </router-link>
-      </nav>
     </header>
 
     <!-- 主内容区 -->
     <main class="dashboard-content">
-      <div class="module-wrapper target-area">
-        <ScanTarget />
-      </div>
-      <div class="module-wrapper status-area">
-        <ScanStatus />
-      </div>
-      <div class="module-wrapper report-area">
-        <ReportGenerator />
-      </div>
+      <ScanTarget />
+      <ScanStatus />
+
+      <ReportGenerator />
     </main>
   </div>
 </template>
@@ -51,32 +31,15 @@ export default {
   components: {
     ScanTarget,
     ScanStatus,
-    ReportGenerator
-  }
+    ReportGenerator,
+  },
 }
 </script>
 
 <style scoped>
 /***********************************
  * 调色板 & 全局变量
- ***********************************/
-:root {
-  --primary: #4361ee;
-  --primary-dark: #3446b8;
-  --accent: #00dbde;
-  --text-primary: #f7fafc;
-  --text-secondary: #cbd5e0;
-  --dark-bg: #1a202c;
-  --card-bg: #242f46;
-  --success: #48bb78;
-  --warning: #ecc94b;
-  --danger: #f56565;
-  --info: #4299e1;
-  --border-radius: 16px;
-  --border: rgba(255, 255, 255, 0.08);
-  --box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --transition: all 0.3s ease;
-}
+ ***********************************
 
 /***********************************
  * 页面骨架
@@ -84,12 +47,14 @@ export default {
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: auto;
   background: var(--dark-bg);
   color: var(--text-primary);
   padding: 24px;
   overflow-x: hidden;
   position: relative;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 .dashboard-container::before {
@@ -97,9 +62,9 @@ export default {
   position: absolute;
   inset: 0;
   background:
-      radial-gradient(circle at 15% 25%, rgba(67, 97, 238, 0.15) 0%, transparent 40%),
-      radial-gradient(circle at 85% 35%, rgba(67, 97, 238, 0.12) 0%, transparent 45%),
-      radial-gradient(circle at 50% 90%, rgba(67, 97, 238, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 15% 25%, rgba(67, 97, 238, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 35%, rgba(67, 97, 238, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(67, 97, 238, 0.1) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   filter: blur(60px);
@@ -116,6 +81,7 @@ export default {
   position: relative;
   z-index: 1;
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 .app-header::after {
   content: '';
@@ -141,7 +107,9 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.app-title i { color: var(--accent); }
+.app-title i {
+  color: var(--accent);
+}
 .app-subtitle {
   font-size: 1rem;
   max-width: 640px;
@@ -189,13 +157,18 @@ export default {
   grid-template-areas:
     'target status'
     'report report';
-  gap: 28px;
-  margin-top: 42px;
+  gap: 20px;
   grid-auto-rows: 1fr;
 }
-.target-area  { grid-area: target; }
-.status-area  { grid-area: status; }
-.report-area  { grid-area: report; }
+.target-area {
+  grid-area: target;
+}
+.status-area {
+  grid-area: status;
+}
+.report-area {
+  grid-area: report;
+}
 
 /***********************************
  * 模块包裹器

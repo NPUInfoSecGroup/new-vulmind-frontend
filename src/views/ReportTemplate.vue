@@ -32,10 +32,10 @@
     <!-- ========== 模板列表 ========== -->
     <div class="template-list">
       <div
-          class="template-card"
-          v-for="template in templates"
-          :key="template.id"
-          :class="{ 'default-template': template.isDefault }"
+        class="template-card"
+        v-for="template in templates"
+        :key="template.id"
+        :class="{ 'default-template': template.isDefault }"
       >
         <div class="card-header">
           <div class="template-meta">
@@ -53,14 +53,14 @@
             </el-tooltip>
 
             <el-tooltip
-                effect="dark"
-                :content="template.isDefault ? '已是默认模板' : '设为默认模板'"
-                placement="top"
+              effect="dark"
+              :content="template.isDefault ? '已是默认模板' : '设为默认模板'"
+              placement="top"
             >
               <el-button
-                  circle
-                  :type="template.isDefault ? 'success' : ''"
-                  @click="setAsDefault(template)"
+                circle
+                :type="template.isDefault ? 'success' : ''"
+                @click="setAsDefault(template)"
               >
                 <i class="fas" :class="template.isDefault ? 'fa-check' : 'fa-star'"></i>
               </el-button>
@@ -101,19 +101,19 @@
 
     <!-- ========== 模板编辑对话框 ========== -->
     <el-dialog
-        v-model="editorVisible"
-        :title="editorTitle"
-        width="80%"
-        custom-class="template-editor-dialog"
+      v-model="editorVisible"
+      :title="editorTitle"
+      width="80%"
+      custom-class="template-editor-dialog"
     >
       <div class="template-editor-container">
         <!-- ====== 顶部输入 ====== -->
         <div class="editor-header">
           <el-input v-model="currentTemplate.name" placeholder="模板名称" />
           <el-switch
-              v-model="currentTemplate.isDefault"
-              active-text="设为默认模板"
-              inactive-text=""
+            v-model="currentTemplate.isDefault"
+            active-text="设为默认模板"
+            inactive-text=""
           />
         </div>
 
@@ -170,16 +170,12 @@
 
           <!-- 右侧下拉区块 -->
           <div class="toolbar-right">
-            <el-select
-                v-model="selectedSection"
-                placeholder="添加区块"
-                class="section-select"
-            >
+            <el-select v-model="selectedSection" placeholder="添加区块" class="section-select">
               <el-option
-                  v-for="section in sections"
-                  :key="section.value"
-                  :label="section.label"
-                  :value="section.value"
+                v-for="section in sections"
+                :key="section.value"
+                :label="section.label"
+                :value="section.value"
               />
             </el-select>
             <el-button type="primary" plain @click="insertSection">
@@ -191,20 +187,20 @@
         <!-- ====== 编辑器 + 预览 ====== -->
         <div class="editor-content">
           <textarea
-              ref="markdownTextarea"
-              v-model="currentTemplate.content"
-              class="markdown-editor"
-              placeholder="在此输入Markdown格式的报告模板..."
+            ref="markdownTextarea"
+            v-model="currentTemplate.content"
+            class="markdown-editor"
+            placeholder="在此输入Markdown格式的报告模板..."
           ></textarea>
 
           <div class="preview-pane">
             <div class="preview-header">
-            <h4><i class="fas fa-eye"></i> 实时预览</h4>
+              <h4><i class="fas fa-eye"></i> 实时预览</h4>
             </div>
             <div class="preview-content">
-            <div v-html="renderedContent"></div>
+              <div v-html="renderedContent"></div>
             </div>
-            </div>
+          </div>
         </div>
       </div>
 
@@ -253,7 +249,7 @@ export default {
           </div>
 
         </div>
-`
+`,
       },
       {
         id: 'tpl-002',
@@ -279,7 +275,7 @@ export default {
           </div>
 
         </div>
-`
+`,
       },
       {
         id: 'tpl-003',
@@ -305,8 +301,8 @@ export default {
           </div>
 
         </div>
-`
-      }
+`,
+      },
     ])
 
     const editorVisible = ref(false)
@@ -317,12 +313,12 @@ export default {
       name: '',
       content: '',
       isDefault: false,
-      created: ''
+      created: '',
     })
 
     // 解析 Markdown + 清洗
     const renderedContent = computed(() =>
-        DOMPurify.sanitize(marked.parse(currentTemplate.content || ''))
+      DOMPurify.sanitize(marked.parse(currentTemplate.content || '')),
     )
 
     // 区块下拉
@@ -332,7 +328,7 @@ export default {
       { value: 'recommendations', label: '修复建议' },
       { value: 'risk_levels', label: '风险评级' },
       { value: 'compliance', label: '合规检查' },
-      { value: 'executive_summary', label: '执行摘要' }
+      { value: 'executive_summary', label: '执行摘要' },
     ])
     const selectedSection = ref('')
 
@@ -412,7 +408,7 @@ export default {
       recommendations: `## 修复建议\n\n1. 建议一\n2. 建议二\n`,
       risk_levels: `## 风险评级\n\n| 等级 | 说明 |\n| --- | --- |\n| 高 | 立即处理 |\n`,
       compliance: `## 合规检查\n\n- 标准: \n- 结果: \n`,
-      executive_summary: `## 执行摘要\n\n> 用一句话总结关键风险。\n`
+      executive_summary: `## 执行摘要\n\n> 用一句话总结关键风险。\n`,
     }
 
     const insertSection = () => {
@@ -466,7 +462,7 @@ export default {
         name: '未命名模板',
         content: '# 报告标题\n\n## 章节标题\n...',
         isDefault: false,
-        created: ''
+        created: '',
       })
     }
 
@@ -501,20 +497,21 @@ export default {
       setAsDefault,
       deleteTemplate,
       importTemplate,
-      exportAllTemplates
+      exportAllTemplates,
     }
-  }
+  },
 }
 </script>
-
 
 <style scoped>
 /* 基础样式重置 */
 .report-template-view {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 2rem;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  min-height: 100vh;
+  height: auto;
   color: #e2e8f0;
 }
 
@@ -827,7 +824,8 @@ h1 {
   color: #94a3b8;
 }
 
-.create-date, .template-id {
+.create-date,
+.template-id {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1124,5 +1122,4 @@ h1 {
   overflow-x: auto;
   border-radius: 8px;
 }
-
 </style>

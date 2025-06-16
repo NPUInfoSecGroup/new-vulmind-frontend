@@ -14,6 +14,24 @@
     --text-secondary: #94a3b8;
 }
 
+:root {
+    --primary: #4361ee;
+    --primary-dark: #3446b8;
+    --accent: #00dbde;
+    --text-primary: #f7fafc;
+    --text-secondary: #cbd5e0;
+    --dark-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --card-bg: #242f46;
+    --success: #48bb78;
+    --warning: #ecc94b;
+    --danger: #f56565;
+    --info: #4299e1;
+    --border-radius: 1rem;
+    --border: rgba(255, 255, 255, 0.08);
+    --box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    --transition: all 0.3s ease;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -24,28 +42,17 @@
 body {
     background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
     color: var(--text-primary);
-    min-height: 100vh;
+    height: auto;
     overflow-x: hidden;
     line-height: 1.6;
 }
 
 #app {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
+    /* max-width: 1400px; */
+    /* margin: 0 auto; */
+    padding: 1rem;
     position: relative;
     z-index: 2;
-}
-
-.app-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-    padding: 1.5rem;
-    border-radius: 12px;
-    background: var(--card-bg);
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
 }
 
 .app-title {
@@ -67,12 +74,6 @@ body {
     font-weight: 400;
 }
 
-.dashboard-container {
-    display: grid;
-    grid-template-columns: 7fr 5fr;
-    gap: 25px;
-    margin-top: 2rem;
-}
 
 /* 卡片公共样式 */
 .card {

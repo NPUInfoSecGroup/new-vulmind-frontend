@@ -23,9 +23,9 @@
           <div class="filter-row">
             <el-form-item label="扫描目标">
               <el-input
-                  v-model="filterForm.target"
-                  placeholder="输入URL或关键词"
-                  class="filter-input"
+                v-model="filterForm.target"
+                placeholder="输入URL或关键词"
+                class="filter-input"
               >
                 <template #prefix>
                   <i class="fas fa-bullseye"></i>
@@ -35,13 +35,13 @@
 
             <el-form-item label="日期范围">
               <el-date-picker
-                  v-model="filterForm.dateRange"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  value-format="YYYY-MM-DD"
-                  class="filter-date-picker"
+                v-model="filterForm.dateRange"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                value-format="YYYY-MM-DD"
+                class="filter-date-picker"
               >
                 <template #prefix>
                   <i class="fas fa-calendar"></i>
@@ -52,11 +52,7 @@
 
           <div class="filter-row">
             <el-form-item label="状态">
-              <el-select
-                  v-model="filterForm.status"
-                  placeholder="选择状态"
-                  class="filter-select"
-              >
+              <el-select v-model="filterForm.status" placeholder="选择状态" class="filter-select">
                 <el-option label="全部" value=""></el-option>
                 <el-option label="已完成" value="completed"></el-option>
                 <el-option label="失败" value="failed"></el-option>
@@ -65,17 +61,10 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button
-                  type="primary"
-                  @click="searchHistory"
-                  class="filter-button primary"
-              >
+              <el-button type="primary" @click="searchHistory" class="filter-button primary">
                 <i class="fas fa-search"></i> 搜索
               </el-button>
-              <el-button
-                  @click="resetFilter"
-                  class="filter-button secondary"
-              >
+              <el-button @click="resetFilter" class="filter-button secondary">
                 <i class="fas fa-undo"></i> 重置
               </el-button>
             </el-form-item>
@@ -88,15 +77,15 @@
     <div class="history-card">
       <div class="history-list">
         <el-table
-            :data="filteredHistory"
-            style="width: 100%"
-            class="scan-history-table"
-            row-class-name="scan-row"
-            header-row-class-name="header-row"
-            @row-click="handleRowClick"
+          :data="filteredHistory"
+          style="width: 100%"
+          class="scan-history-table"
+          row-class-name="scan-row"
+          header-row-class-name="header-row"
+          @row-click="handleRowClick"
         >
           <el-table-column prop="date" label="扫描日期" width="180">
-            <template #default="{row}">
+            <template #default="{ row }">
               <div class="date-container">
                 <div class="date-value">{{ row.date }}</div>
                 <div class="time-value">{{ row.time }}</div>
@@ -105,7 +94,7 @@
           </el-table-column>
 
           <el-table-column prop="target" label="扫描目标">
-            <template #default="{row}">
+            <template #default="{ row }">
               <div class="target-container">
                 <i class="fas" :class="row.type === 'web' ? 'fa-globe' : 'fa-file-code'"></i>
                 <span>{{ row.target }}</span>
@@ -114,12 +103,12 @@
           </el-table-column>
 
           <el-table-column prop="type" label="扫描类型" width="120">
-            <template #default="{row}">
+            <template #default="{ row }">
               <el-tag
-                  :type="row.type === 'web' ? 'success' : 'info'"
-                  class="scan-type-tag"
-                  effect="dark"
-                  round
+                :type="row.type === 'web' ? 'success' : 'info'"
+                class="scan-type-tag"
+                effect="dark"
+                round
               >
                 {{ row.type === 'web' ? 'Web扫描' : '二进制扫描' }}
               </el-tag>
@@ -127,7 +116,7 @@
           </el-table-column>
 
           <el-table-column label="结果概要" width="180">
-            <template #default="{row}">
+            <template #default="{ row }">
               <div class="vuln-summary">
                 <div class="vuln-item critical" v-if="row.vulnSummary.critical > 0">
                   <span class="vuln-count">{{ row.vulnSummary.critical }}</span>
@@ -150,20 +139,20 @@
           </el-table-column>
 
           <el-table-column label="操作" width="240" fixed="right">
-            <template #default="{row}">
+            <template #default="{ row }">
               <div class="action-buttons">
                 <el-button
-                    size="small"
-                    class="action-button tech-details"
-                    @click.stop="viewTechnicalDetails(row)"
+                  size="small"
+                  class="action-button tech-details"
+                  @click.stop="viewTechnicalDetails(row)"
                 >
                   <i class="fas fa-search"></i> 技术细节
                 </el-button>
                 <el-button
-                    size="small"
-                    type="primary"
-                    class="action-button generate-report"
-                    @click.stop="generateReport(row)"
+                  size="small"
+                  type="primary"
+                  class="action-button generate-report"
+                  @click.stop="generateReport(row)"
                 >
                   <i class="fas fa-file-pdf"></i> 生成报告
                 </el-button>
@@ -174,23 +163,23 @@
 
         <div class="pagination-section">
           <el-pagination
-              background
-              layout="prev, pager, next, jumper"
-              :total="totalItems"
-              :page-size="pageSize"
-              :current-page="currentPage"
-              @current-change="handlePageChange"
-              class="history-pagination"
+            background
+            layout="prev, pager, next, jumper"
+            :total="totalItems"
+            :page-size="pageSize"
+            :current-page="currentPage"
+            @current-change="handlePageChange"
+            class="history-pagination"
           />
         </div>
       </div>
     </div>
     <el-dialog
-        v-model="detailDialogVisible"
-        :title="`扫描技术细节 - ${currentScan ? currentScan.target : ''}`"
-        width="85%"
-        top="5vh"
-        custom-class="tech-detail-dialog"
+      v-model="detailDialogVisible"
+      :title="`扫描技术细节 - ${currentScan ? currentScan.target : ''}`"
+      width="85%"
+      top="5vh"
+      custom-class="tech-detail-dialog"
     >
       <div class="tech-detail-container" v-if="currentScan">
         <!-- 扫描元数据部分保持不变 -->
@@ -205,10 +194,10 @@
           <div class="vuln-list">
             <!-- 每个漏洞项 -->
             <div
-                v-for="vuln in currentScan.vulnerabilities"
-                :key="vuln.id"
-                class="vuln-item"
-                :class="vuln.severity"
+              v-for="vuln in currentScan.vulnerabilities"
+              :key="vuln.id"
+              class="vuln-item"
+              :class="vuln.severity"
             >
               <!-- 漏洞头部信息 -->
               <div class="vuln-header">
@@ -216,10 +205,10 @@
                   <span class="vuln-id">{{ vuln.id }}</span>
                   <span class="vuln-name">{{ vuln.name }}</span>
                   <el-tag
-                      :type="getSeverityTagType(vuln.severity)"
-                      size="small"
-                      effect="dark"
-                      class="severity-tag"
+                    :type="getSeverityTagType(vuln.severity)"
+                    size="small"
+                    effect="dark"
+                    class="severity-tag"
                   >
                     {{ getSeverityLabel(vuln.severity) }}
                   </el-tag>
@@ -248,8 +237,8 @@
                   <div class="info-item">
                     <label>风险等级:</label>
                     <span :class="'risk-level ' + vuln.severity">
-                  {{ getSeverityLevel(vuln.severity) }}
-                </span>
+                      {{ getSeverityLevel(vuln.severity) }}
+                    </span>
                   </div>
                   <div class="info-item">
                     <label>发现时间:</label>
@@ -290,10 +279,10 @@ import { ElMessage } from 'element-plus'
 export default {
   setup() {
     // 历史记录数据 - 现在初始化为空数组
-    const scanHistory = ref([]);
+    const scanHistory = ref([])
 
     // 加载状态
-    const loading = ref(true);
+    const loading = ref(true)
 
     // 加载扫描历史数据
     const loadScanHistory = () => {
@@ -301,17 +290,12 @@ export default {
         loading.value = true
 
         // ① webpack 会在构建时扫描目录
-        const ctx = require.context(
-            '@/scan-details',
-            false,
-            /^\.\/scan-\d{10}\.json$/
-        )
+        const ctx = require.context('@/scan-details', false, /^\.\/scan-\d{10}\.json$/)
 
         scanHistory.value = ctx
-            .keys()
-            .map(k => ctx(k))
-            .sort((a, b) => b.id.localeCompare(a.id))
-
+          .keys()
+          .map((k) => ctx(k))
+          .sort((a, b) => b.id.localeCompare(a.id))
       } catch (e) {
         console.error(e)
         ElMessage.error('加载扫描记录失败')
@@ -322,117 +306,131 @@ export default {
 
     // 组件挂载时加载数据
     onMounted(() => {
-      loadScanHistory();
-    });
+      loadScanHistory()
+    })
 
     // 过滤表单
     const filterForm = reactive({
       target: '',
       dateRange: [],
-      status: ''
-    });
+      status: '',
+    })
 
     // 分页设置
-    const currentPage = ref(1);
-    const pageSize = ref(5);
-    const totalItems = computed(() => scanHistory.value.length);
+    const currentPage = ref(1)
+    const pageSize = ref(5)
+    const totalItems = computed(() => scanHistory.value.length)
 
     // 过滤后的历史记录
     const filteredHistory = computed(() => {
-      return scanHistory.value.filter(record => {
-        const matchesTarget = filterForm.target
+      return scanHistory.value
+        .filter((record) => {
+          const matchesTarget = filterForm.target
             ? record.target.toLowerCase().includes(filterForm.target.toLowerCase())
-            : true;
+            : true
 
-        const matchesDate = filterForm.dateRange.length === 2
-            ? record.date >= filterForm.dateRange[0] && record.date <= filterForm.dateRange[1]
-            : true;
+          const matchesDate =
+            filterForm.dateRange.length === 2
+              ? record.date >= filterForm.dateRange[0] && record.date <= filterForm.dateRange[1]
+              : true
 
-        const matchesStatus = filterForm.status
-            ? record.status === filterForm.status
-            : true;
+          const matchesStatus = filterForm.status ? record.status === filterForm.status : true
 
-        return matchesTarget && matchesDate && matchesStatus;
-      }).slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value);
-    });
+          return matchesTarget && matchesDate && matchesStatus
+        })
+        .slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
+    })
 
     // 搜索历史
     const searchHistory = () => {
-      currentPage.value = 1;
+      currentPage.value = 1
     }
 
     // 重置筛选条件
     const resetFilter = () => {
-      filterForm.target = '';
-      filterForm.dateRange = [];
-      filterForm.status = '';
-      currentPage.value = 1;
+      filterForm.target = ''
+      filterForm.dateRange = []
+      filterForm.status = ''
+      currentPage.value = 1
     }
 
     // 分页切换
     const handlePageChange = (page) => {
-      currentPage.value = page;
+      currentPage.value = page
     }
 
     // 技术细节弹窗控制
-    const detailDialogVisible = ref(false);
-    const currentScan = ref(null);
+    const detailDialogVisible = ref(false)
+    const currentScan = ref(null)
 
     // 获取漏洞严重性标签类型
     const getSeverityTagType = (severity) => {
-      switch(severity) {
-        case 'critical': return 'danger';
-        case 'high': return 'warning';
-        case 'medium': return 'primary';
-        case 'low': return 'success';
-        default: return 'info';
+      switch (severity) {
+        case 'critical':
+          return 'danger'
+        case 'high':
+          return 'warning'
+        case 'medium':
+          return 'primary'
+        case 'low':
+          return 'success'
+        default:
+          return 'info'
       }
     }
 
     // 获取漏洞严重性文本标签
     const getSeverityLabel = (severity) => {
-      switch(severity) {
-        case 'critical': return '严重';
-        case 'high': return '高危';
-        case 'medium': return '中危';
-        case 'low': return '低危';
-        default: return '未知';
+      switch (severity) {
+        case 'critical':
+          return '严重'
+        case 'high':
+          return '高危'
+        case 'medium':
+          return '中危'
+        case 'low':
+          return '低危'
+        default:
+          return '未知'
       }
     }
 
     // 获取风险等级文本
     const getSeverityLevel = (severity) => {
-      switch(severity) {
-        case 'critical': return '极高风险';
-        case 'high': return '高风险';
-        case 'medium': return '中等风险';
-        case 'low': return '低风险';
-        default: return '未知风险';
+      switch (severity) {
+        case 'critical':
+          return '极高风险'
+        case 'high':
+          return '高风险'
+        case 'medium':
+          return '中等风险'
+        case 'low':
+          return '低风险'
+        default:
+          return '未知风险'
       }
     }
 
     // 查看技术细节
     const viewTechnicalDetails = (row) => {
-      currentScan.value = { ...row };
-      detailDialogVisible.value = true;
+      currentScan.value = { ...row }
+      detailDialogVisible.value = true
     }
 
     // 生成报告
     const generateReport = (row) => {
-      ElMessage.success(`正在生成 ${row.target} 的扫描报告...`);
+      ElMessage.success(`正在生成 ${row.target} 的扫描报告...`)
       // 实际生成报告逻辑
     }
 
     // 处理行点击
     const handleRowClick = (row) => {
-      console.log('点击行:', row.id);
+      console.log('点击行:', row.id)
     }
-
-
 
     const exportVulnerability = (vuln) => {
       const blob = new Blob([JSON.stringify(vuln, null, 2)], {
-        type: 'application/json'
+        type: 'application/json',
       })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -461,19 +459,21 @@ export default {
       getSeverityLabel,
       getSeverityLevel,
       loading,
-      exportVulnerability
+      exportVulnerability,
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
 /* 基础样式 */
 .scan-history-view {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 2rem;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  min-height: 100vh;
+  height: auto;
   color: #e2e8f0;
 }
 
@@ -587,7 +587,9 @@ h1 {
   min-width: 300px;
 }
 
-.filter-input, .filter-date-picker, .filter-select {
+.filter-input,
+.filter-date-picker,
+.filter-select {
   width: 100%;
 }
 
@@ -1135,10 +1137,18 @@ h1 {
   background: rgba(100, 116, 139, 0.15);
 }
 
-.risk-level.critical { color: #f87171; }
-.risk-level.high     { color: #fbbf24; }
-.risk-level.medium   { color: #60a5fa; }
-.risk-level.low      { color: #34d399; }
+.risk-level.critical {
+  color: #f87171;
+}
+.risk-level.high {
+  color: #fbbf24;
+}
+.risk-level.medium {
+  color: #60a5fa;
+}
+.risk-level.low {
+  color: #34d399;
+}
 
 .vuln-description p {
   line-height: 1.6;
@@ -1150,6 +1160,6 @@ h1 {
 }
 
 .vuln-item {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, .25);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 </style>
