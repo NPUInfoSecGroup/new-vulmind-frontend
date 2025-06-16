@@ -16,7 +16,10 @@
         <p>api_key</p>
         <el-input v-model="api_key" placeholder="请输入模型名称" size="large"></el-input>
       </el-collapse-item>
-      <el-collapse-item title="MCP插件" name="2"> </el-collapse-item>
+      <el-collapse-item title="服务器配置" name="2">
+        <p>服务器地址</p>
+        <el-input v-model="serve_url" placeholder="请输入base_url" size="large"></el-input>
+      </el-collapse-item>
     </el-collapse>
   </div>
 </template>
@@ -36,6 +39,7 @@ const options = ref([
 ])
 
 const base_url = ref('')
+const serve_url = ref('')
 const api_key = ref('')
 </script>
 

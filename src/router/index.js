@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '../views/Dashboard.vue'
+import Dashboard from '../views/Home/Dashboard.vue'
 
 const base = import.meta.env.BASE_URL
 
@@ -18,25 +18,31 @@ const routes = [
     path: '/scan-history',
     name: 'ScanHistory',
     meta: { title: app + ' - 扫描记录' }, // 此处加自定义字段
-    component: () => import('@/views/ScanHistory.vue'),
+    component: () => import('@/views/Task/ScanHistory.vue'),
+  },
+  {
+    path: '/scan-history/:taskID',
+    name: 'Task',
+    component: () => import('@/views/Task/Scanner/ScannerPage.vue'),
+    meta: { title: app + ' - 扫描任务' }, // 此处加自定义字段
   },
   {
     path: '/report-templates',
     name: 'ReportTemplates',
     meta: { title: app + ' - 生成报告' }, // 此处加自定义字段
-    component: () => import('@/views/ReportTemplate.vue'),
+    component: () => import('@/views/Report/ReportTemplate.vue'),
   },
   {
     path: '/chat',
     name: 'Chat',
     meta: { title: app + ' - 聊天' }, // 此处加自定义字段
-    component: () => import('@/views/MessageView.vue'),
+    component: () => import('@/views/Task/Scanner/Environment/Message/MessageView.vue'),
   },
   {
     path: '/config',
     name: 'Config',
     meta: { title: app + ' - 用户配置' }, // 此处加自定义字段
-    component: () => import('@/views/UserConfigPage.vue'), // 显示扫描页内容
+    component: () => import('@/views/Config/UserConfigPage.vue'), // 显示扫描页内容
   },
 ]
 

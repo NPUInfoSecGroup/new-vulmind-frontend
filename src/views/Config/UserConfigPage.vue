@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import ConfigSubView from './Config/ConfigSubView.vue'
+import ConfigSubView from './ConfigSubView.vue'
 
 function saveConfig() {
   console.log('保存配置')

@@ -22,9 +22,9 @@
 </template>
 
 <script>
-import ScanTarget from '@/components/ScanTarget.vue'
-import ScanStatus from '@/components/ScanStatus.vue'
-import ReportGenerator from '@/components/ReportGenerator.vue'
+import ScanTarget from '@/views/Home/ScanTarget.vue'
+import ScanStatus from '@/views/Home/ScanStatus.vue'
+import ReportGenerator from '@/views/Home/ReportGenerator.vue'
 
 export default {
   name: 'Dashboard',

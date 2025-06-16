@@ -137,3 +137,46 @@ export const useScanStore = defineStore('scan', {
     },
   },
 })
+
+// 任务信息存储
+
+var task = {
+  id: null,
+  name: '',
+  description: '',
+  status: 'pending', // pending, in-progress, completed, failed
+  startTime: null,
+  endTime: null,
+  error: null,
+  buglist: [],
+}
+
+var bug = {
+  id: null,
+  name: '',
+  description: '',
+  severity: 'low', // low, medium, high, critical
+  cve: '',
+  target: '',
+  timestamp: null,
+}
+
+var TaskList = {
+  tasks: [],
+
+  addTask(task) {
+    this.tasks.push(task)
+  },
+
+  removeTask(taskId) {
+    this.tasks = this.tasks.filter((task) => task.id !== taskId)
+  },
+
+  getTasks() {
+    return this.tasks
+  },
+
+  clearTasks() {
+    this.tasks = []
+  },
+}

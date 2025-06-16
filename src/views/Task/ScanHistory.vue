@@ -74,7 +74,7 @@
     </div>
 
     <!-- 历史记录列表美化 -->
-    <div class="history-card">
+    <!-- <div class="history-card">
       <div class="history-list">
         <el-table
           :data="filteredHistory"
@@ -173,7 +173,81 @@
           />
         </div>
       </div>
-    </div>
+    </div> -->
+    <el-row :gutter="20" class="scan-history-cards">
+      <el-col
+        v-for="(row, index) in filteredHistory"
+        :key="index"
+        :xs="24"
+        :sm="12"
+        :md="8"
+        :lg="6"
+      >
+        <el-card class="scan-history-card" shadow="hover">
+          <div class="scanner-header">
+            <div class="name">
+              {{ row.name || `扫描记录 ${index + 1}` }}
+              <el-tag
+                :type="row.type === 'web' ? 'success' : 'info'"
+                class="scan-type-tag"
+                effect="dark"
+              >
+                {{ row.type === 'web' ? 'Web扫描' : '二进制扫描' }}
+              </el-tag>
+            </div>
+            <div class="date-info">
+              <div class="date">{{ row.date }} {{ row.time }}</div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="target-info">
+              <i class="fas" :class="row.type === 'web' ? 'fa-globe' : 'fa-file-code'"></i>
+              <span class="target">{{ row.target }}</span>
+            </div>
+
+            <div class="vuln-summary">
+              <div class="vuln-item critical" v-if="row.vulnSummary.critical > 0">
+                <span class="vuln-label">严重</span>
+                <span class="vuln-count">{{ row.vulnSummary.critical }}</span>
+              </div>
+              <div class="vuln-item high" v-if="row.vulnSummary.high > 0">
+                <span class="vuln-label">高危</span>
+                <span class="vuln-count">{{ row.vulnSummary.high }}</span>
+              </div>
+              <div class="vuln-item medium" v-if="row.vulnSummary.medium > 0">
+                <span class="vuln-label">中危</span>
+                <span class="vuln-count">{{ row.vulnSummary.medium }}</span>
+              </div>
+              <div class="vuln-item low" v-if="row.vulnSummary.low > 0">
+                <span class="vuln-label">低危</span>
+                <span class="vuln-count">{{ row.vulnSummary.low }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer action-buttons">
+            <el-button type="primary" @click="viewTechnicalDetails(row)">
+              <i class="fas fa-search"></i> 查看详情
+            </el-button>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 分页控件 -->
+    <!-- <div class="pagination-section">
+      <el-pagination
+        background
+        layout="prev, pager, next, jumper"
+        :total="totalItems"
+        :page-size="pageSize"
+        :current-page="currentPage"
+        @current-change="handlePageChange"
+        class="history-pagination"
+      />
+    </div> -->
+
     <el-dialog
       v-model="detailDialogVisible"
       :title="`扫描技术细节 - ${currentScan ? currentScan.target : ''}`"
@@ -272,204 +346,175 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
-export default {
-  setup() {
-    // 历史记录数据 - 现在初始化为空数组
-    const scanHistory = ref([])
+const router = useRouter() // ✅ 获取路由实例
+// 历史记录数据
+const scanHistory = ref([])
 
-    // 加载状态
-    const loading = ref(true)
+// 加载状态
+const loading = ref(true)
 
-    // 加载扫描历史数据
-    const loadScanHistory = async () => {
-      try {
-        loading.value = true;
+// 加载扫描历史数据
+const loadScanHistory = async () => {
+  try {
+    loading.value = true
 
-        // 使用 Vite 的 glob 导入功能
-        const modules = import.meta.glob('/src/scan-details/scan-*.json');
+    const modules = import.meta.glob('/src/scan-details/scan-*.json')
 
-        // 加载所有匹配的文件
-        const scanFiles = await Promise.all(
-          Object.keys(modules).map(async (path) => {
-            const module = await modules[path]();
-            return module.default || module;
-          })
-        );
+    const scanFiles = await Promise.all(
+      Object.keys(modules).map(async (path) => {
+        const module = await modules[path]()
+        return module.default || module
+      }),
+    )
 
-        scanHistory.value = scanFiles
-          .filter(Boolean)
-          .sort((a, b) => b.id.localeCompare(a.id));
+    scanHistory.value = scanFiles.filter(Boolean).sort((a, b) => b.id.localeCompare(a.id))
+  } catch (e) {
+    console.error('加载扫描记录失败:', e)
+    ElMessage.error('加载扫描记录失败: ' + e.message)
+  } finally {
+    loading.value = false
+  }
+}
 
-      } catch (e) {
-        console.error('加载扫描记录失败:', e);
-        ElMessage.error('加载扫描记录失败: ' + e.message);
-      } finally {
-        loading.value = false;
-      }
-    };
+onMounted(() => {
+  loadScanHistory()
+})
 
-    // 组件挂载时加载数据
-    onMounted(() => {
-      loadScanHistory()
-    })
+// 过滤表单
+const filterForm = reactive({
+  target: '',
+  dateRange: [],
+  status: '',
+})
 
-    // 过滤表单
-    const filterForm = reactive({
-      target: '',
-      dateRange: [],
-      status: '',
-    })
+// // 分页设置
+// const currentPage = ref(1)
+// const pageSize = ref(5)
+// const totalItems = computed(() => scanHistory.value.length)
 
-    // 分页设置
-    const currentPage = ref(1)
-    const pageSize = ref(5)
-    const totalItems = computed(() => scanHistory.value.length)
+// 过滤后的历史记录
+const filteredHistory = computed(() => {
+  return scanHistory.value.filter((record) => {
+    const matchesTarget = filterForm.target
+      ? record.target.toLowerCase().includes(filterForm.target.toLowerCase())
+      : true
 
-    // 过滤后的历史记录
-    const filteredHistory = computed(() => {
-      return scanHistory.value
-        .filter((record) => {
-          const matchesTarget = filterForm.target
-            ? record.target.toLowerCase().includes(filterForm.target.toLowerCase())
-            : true
+    const matchesDate =
+      filterForm.dateRange.length === 2
+        ? record.date >= filterForm.dateRange[0] && record.date <= filterForm.dateRange[1]
+        : true
 
-          const matchesDate =
-            filterForm.dateRange.length === 2
-              ? record.date >= filterForm.dateRange[0] && record.date <= filterForm.dateRange[1]
-              : true
+    const matchesStatus = filterForm.status ? record.status === filterForm.status : true
 
-          const matchesStatus = filterForm.status ? record.status === filterForm.status : true
+    return matchesTarget && matchesDate && matchesStatus
+  })
+  // .slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
+})
 
-          return matchesTarget && matchesDate && matchesStatus
-        })
-        .slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
-    })
+// 搜索历史
+const searchHistory = () => {
+  currentPage.value = 1
+}
 
-    // 搜索历史
-    const searchHistory = () => {
-      currentPage.value = 1
-    }
+// 重置筛选条件
+const resetFilter = () => {
+  filterForm.target = ''
+  filterForm.dateRange = []
+  filterForm.status = ''
+  currentPage.value = 1
+}
 
-    // 重置筛选条件
-    const resetFilter = () => {
-      filterForm.target = ''
-      filterForm.dateRange = []
-      filterForm.status = ''
-      currentPage.value = 1
-    }
+// 分页切换
+const handlePageChange = (page) => {
+  currentPage.value = page
+}
 
-    // 分页切换
-    const handlePageChange = (page) => {
-      currentPage.value = page
-    }
+// 技术细节弹窗控制
+const detailDialogVisible = ref(false)
+const currentScan = ref(null)
 
-    // 技术细节弹窗控制
-    const detailDialogVisible = ref(false)
-    const currentScan = ref(null)
+// 获取严重性标签颜色
+const getSeverityTagType = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return 'danger'
+    case 'high':
+      return 'warning'
+    case 'medium':
+      return 'primary'
+    case 'low':
+      return 'success'
+    default:
+      return 'info'
+  }
+}
 
-    // 获取漏洞严重性标签类型
-    const getSeverityTagType = (severity) => {
-      switch (severity) {
-        case 'critical':
-          return 'danger'
-        case 'high':
-          return 'warning'
-        case 'medium':
-          return 'primary'
-        case 'low':
-          return 'success'
-        default:
-          return 'info'
-      }
-    }
+// 获取严重性中文标签
+const getSeverityLabel = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return '严重'
+    case 'high':
+      return '高危'
+    case 'medium':
+      return '中危'
+    case 'low':
+      return '低危'
+    default:
+      return '未知'
+  }
+}
 
-    // 获取漏洞严重性文本标签
-    const getSeverityLabel = (severity) => {
-      switch (severity) {
-        case 'critical':
-          return '严重'
-        case 'high':
-          return '高危'
-        case 'medium':
-          return '中危'
-        case 'low':
-          return '低危'
-        default:
-          return '未知'
-      }
-    }
+// 获取风险等级描述
+const getSeverityLevel = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return '极高风险'
+    case 'high':
+      return '高风险'
+    case 'medium':
+      return '中等风险'
+    case 'low':
+      return '低风险'
+    default:
+      return '未知风险'
+  }
+}
 
-    // 获取风险等级文本
-    const getSeverityLevel = (severity) => {
-      switch (severity) {
-        case 'critical':
-          return '极高风险'
-        case 'high':
-          return '高风险'
-        case 'medium':
-          return '中等风险'
-        case 'low':
-          return '低风险'
-        default:
-          return '未知风险'
-      }
-    }
+// 查看技术细节
+const viewTechnicalDetails = (row) => {
+  currentScan.value = { ...row }
+  router.push('/scan-history/' + row.id)
+}
 
-    // 查看技术细节
-    const viewTechnicalDetails = (row) => {
-      currentScan.value = { ...row }
-      detailDialogVisible.value = true
-    }
+// 生成报告
+const generateReport = (row) => {
+  ElMessage.success(`正在生成 ${row.target} 的扫描报告...`)
+  // TODO: 实际生成逻辑
+}
 
-    // 生成报告
-    const generateReport = (row) => {
-      ElMessage.success(`正在生成 ${row.target} 的扫描报告...`)
-      // 实际生成报告逻辑
-    }
+// 行点击处理
+const handleRowClick = (row) => {
+  console.log('点击行:', row.id)
+}
 
-    // 处理行点击
-    const handleRowClick = (row) => {
-      console.log('点击行:', row.id)
-    }
-
-    const exportVulnerability = (vuln) => {
-      const blob = new Blob([JSON.stringify(vuln, null, 2)], {
-        type: 'application/json',
-      })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${vuln.id}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-      ElMessage.success(`${vuln.id} 已导出`)
-    }
-
-    return {
-      filterForm,
-      filteredHistory,
-      totalItems,
-      pageSize,
-      currentPage,
-      searchHistory,
-      resetFilter,
-      handlePageChange,
-      viewTechnicalDetails,
-      generateReport,
-      handleRowClick,
-      detailDialogVisible,
-      currentScan,
-      getSeverityTagType,
-      getSeverityLabel,
-      getSeverityLevel,
-      loading,
-      exportVulnerability,
-    }
-  },
+// 导出单条漏洞记录为 JSON
+const exportVulnerability = (vuln) => {
+  const blob = new Blob([JSON.stringify(vuln, null, 2)], {
+    type: 'application/json',
+  })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${vuln.id}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+  ElMessage.success(`${vuln.id} 已导出`)
 }
 </script>
 
@@ -717,13 +762,6 @@ h1 {
   letter-spacing: 0.5px;
 }
 
-/* 漏洞摘要样式 */
-.vuln-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
 .vuln-item {
   display: flex;
   align-items: center;
@@ -762,6 +800,9 @@ h1 {
 .action-buttons {
   display: flex;
   gap: 0.5rem;
+  flex-direction: row-reverse;
+  align-items: center;
+  height: 2.5rem;
 }
 
 .action-button {
@@ -931,25 +972,10 @@ h1 {
   color: #60a5fa;
 }
 
-.vuln-count {
-  font-size: 1rem;
-  color: #94a3b8;
-  margin-left: 0.5rem;
-}
-
 .vuln-list {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
-}
-
-.vuln-item {
-  background: rgba(30, 41, 59, 0.6);
-  border-radius: 10px;
-  overflow: hidden;
-  border-left: 4px solid;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .vuln-item.critical {
@@ -1169,5 +1195,71 @@ h1 {
 
 .vuln-item {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+.scanner-header {
+  align-items: flex-start;
+  gap: 12px;
+  flex-direction: column;
+}
+.scan-history-card {
+  background-color: #0f172a;
+  border-radius: 1rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  color: #cbd5e0;
+}
+.date-info {
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  color: #404853;
+}
+.scan-type-tag {
+  border-radius: 0.5rem;
+}
+.name {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5rem;
+}
+.target-info {
+  background-color: #081322;
+  box-shadow: var(--box-shadow);
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+.scan-history-card {
+  height: 15rem;
+}
+.vuln-summary {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.vuln-item {
+  /* height: 100%; */
+  font-size: 0.8rem !important;
+  margin: 10px 0;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.vuln-count {
+  font-size: 0.8rem;
+  margin-left: 5px;
 }
 </style>

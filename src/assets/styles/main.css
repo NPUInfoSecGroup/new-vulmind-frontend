@@ -555,6 +555,11 @@ body {
     }
 }
 
+.el-input {
+    height: 3rem;
+}
+
+
 .el-input__wrapper {
     width: 100%;
     background: rgba(255, 255, 255, 0.08);
@@ -569,8 +574,8 @@ body {
 }
 
 button.el-button.is-circle {
-    height: 4rem;
-    width: 4rem;
+    height: auto;
+    width: auto;
     font-size: 2rem;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border);
@@ -609,4 +614,19 @@ button.el-button.is-circle {
 
 .el-select-dropdown__item.is-hovering {
     background-color: #1c2e53be;
+}
+
+button.el-button.el-button--primary {
+    background-color: #0061a85e;
+    border: 1.5px solid #458489;
+    border-radius: .5rem;
+    box-shadow: var(--box-shadow);
+    font-weight: 700;
+    padding: 18px 20px;
+
+}
+
+.el-menu--horizontal .el-menu-item:not(.is-disabled):focus,
+.el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
+    background-color: #021d3000;
 }
