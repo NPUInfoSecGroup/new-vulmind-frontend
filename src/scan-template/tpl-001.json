@@ -1,0 +1,8 @@
+{
+  "id": "tpl-001",
+  "name": "标准技术报告",
+  "isDefault": true,
+  "created": "2023-08-12",
+  "content": "# 安全扫描报告\n\n## 扫描概述\n...",
+  "preview": "<div class=\"template-preview-content\"><h3>安全扫描报告</h3><div class=\"preview-stats\"><span class=\"stat-item\"><i class=\"fas fa-bug\"></i> 漏洞: 12</span><span class=\"stat-item\"><i class=\"fas fa-exclamation-triangle\"></i> 严重: 3</span></div><div class=\"preview-sections\"><p>扫描概述 | 漏洞列表 | 修复建议</p></div></div>"
+}

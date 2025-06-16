@@ -1,0 +1,8 @@
+{
+  "id": "tpl-002",
+  "name": "管理层摘要报告",
+  "isDefault": false,
+  "created": "2023-09-01",
+  "content": "# 安全风险摘要\n\n## 关键发现\n...",
+  "preview": "<div class=\"template-preview-content\"><h3>安全风险摘要</h3><div class=\"preview-stats\"><span class=\"stat-item\"><i class=\"fas fa-chart-pie\"></i> 风险评级: 高</span><span class=\"stat-item\"><i class=\"fas fa-clock\"></i> 预计修复: 3天</span></div><div class=\"preview-sections\"><p>执行摘要 | 风险评级 | 行动计划</p></div></div>"
+}

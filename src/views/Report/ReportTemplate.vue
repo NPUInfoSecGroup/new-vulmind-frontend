@@ -1,6 +1,6 @@
 <template>
   <div class="report-template-view">
-    <!-- ========== 头部 ========== -->
+    <!-- 头部 -->
     <div class="header-section">
       <div class="header-content">
         <div class="title-container">
@@ -8,9 +8,12 @@
         </div>
         <p class="subtitle">创建、编辑和管理您的安全扫描报告模板</p>
       </div>
+      <div class="folder-info" v-if="currentFolder">
+        <i class="fas fa-folder"></i> {{ currentFolder.name }}
+      </div>
     </div>
 
-    <!-- ========== 操作按钮 ========== -->
+    <!-- 操作按钮 -->
     <div class="action-section">
       <el-button type="primary" class="action-button" @click="createNewTemplate">
         <i class="fas fa-plus"></i> 创建新模板
@@ -21,9 +24,35 @@
       <el-button class="action-button tertiary" @click="exportAllTemplates">
         <i class="fas fa-file-export"></i> 批量导出
       </el-button>
+
+      <!-- 文件夹选择按钮 -->
+      <el-button
+        class="action-button folder"
+        type="info"
+        @click="selectTemplateFolder"
+      >
+        <i class="fas fa-folder-open"></i> {{ currentFolder ? '切换文件夹' : '选择模板文件夹' }}
+      </el-button>
+
+      <el-button
+        class="action-button"
+        type="success"
+        @click="loadTemplates"
+        :disabled="!currentFolder"
+      >
+        <i class="fas fa-sync-alt"></i> 重新加载模板
+      </el-button>
     </div>
 
-    <!-- ========== 模板列表 ========== -->
+    <!-- 加载提示 -->
+    <div class="loading-section" v-if="loading">
+      <el-icon class="is-loading">
+        <loading />
+      </el-icon>
+      <span>加载模板中...</span>
+    </div>
+
+    <!-- 模板列表 -->
     <div class="template-list">
       <div
         class="template-card"
@@ -91,213 +120,161 @@
           <span>添加新模板</span>
         </div>
       </div>
+
+      <!-- 空状态 -->
+      <div class="empty-templates" v-if="templates.length === 0 && !loading">
+        <i class="fas fa-file-alt"></i>
+        <h3>没有找到模板</h3>
+        <p>请创建新模板或导入现有模板</p>
+        <el-button type="primary" @click="createNewTemplate">创建新模板</el-button>
+      </div>
     </div>
 
-    <!-- ========== 模板编辑对话框 ========== -->
+    <!-- 模板编辑对话框 -->
     <el-dialog
       v-model="editorVisible"
       :title="editorTitle"
       width="80%"
       custom-class="template-editor-dialog"
     >
+      <!-- 编辑器主体 -->
       <div class="template-editor-container">
-        <!-- ====== 顶部输入 ====== -->
+        <!-- 模板名称和默认标记 -->
         <div class="editor-header">
-          <el-input v-model="currentTemplate.name" placeholder="模板名称" />
-          <el-switch
-            v-model="currentTemplate.isDefault"
-            active-text="设为默认模板"
-            inactive-text=""
+          <el-input
+            v-model="currentTemplate.name"
+            placeholder="输入模板名称"
+            clearable
+            class="template-name-input"
           />
+          <div class="default-switch">
+            <span class="switch-label">设为默认模板：</span>
+            <el-switch v-model="currentTemplate.isDefault" />
+          </div>
         </div>
 
-        <!-- ====== 工具栏 ====== -->
+        <!-- 功能工具栏 -->
         <div class="editor-toolbar">
           <div class="toolbar-left">
-            <!-- 粗斜下 -->
-            <el-button-group>
-              <el-tooltip effect="dark" content="加粗" placement="top">
-                <el-button @click="makeBold">
-                  <i class="fas fa-bold"></i>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="斜体" placement="top">
-                <el-button @click="makeItalic">
-                  <i class="fas fa-italic"></i>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="下划线" placement="top">
-                <el-button @click="makeUnderline">
-                  <i class="fas fa-underline"></i>
-                </el-button>
-              </el-tooltip>
-            </el-button-group>
-
-            <!-- 列表 -->
-            <el-button-group>
-              <el-tooltip effect="dark" content="无序列表" placement="top">
-                <el-button @click="makeUnorderedList">
-                  <i class="fas fa-list-ul"></i>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="有序列表" placement="top">
-                <el-button @click="makeOrderedList">
-                  <i class="fas fa-list-ol"></i>
-                </el-button>
-              </el-tooltip>
-            </el-button-group>
-
-            <!-- 链接 / 图片 -->
-            <el-button-group>
-              <el-tooltip effect="dark" content="插入链接" placement="top">
-                <el-button @click="insertLink">
-                  <i class="fas fa-link"></i>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="插入图片" placement="top">
-                <el-button @click="insertImage">
-                  <i class="fas fa-image"></i>
-                </el-button>
-              </el-tooltip>
-            </el-button-group>
+            <el-button circle @click="makeBold">
+              <i class="fas fa-bold"></i>
+            </el-button>
+            <el-button circle @click="makeItalic">
+              <i class="fas fa-italic"></i>
+            </el-button>
+            <el-button circle @click="makeUnderline">
+              <i class="fas fa-underline"></i>
+            </el-button>
+            <el-button circle @click="makeUnorderedList">
+              <i class="fas fa-list-ul"></i>
+            </el-button>
+            <el-button circle @click="makeOrderedList">
+              <i class="fas fa-list-ol"></i>
+            </el-button>
           </div>
 
-          <!-- 右侧下拉区块 -->
           <div class="toolbar-right">
-            <el-select v-model="selectedSection" placeholder="添加区块" class="section-select">
+            <el-select v-model="selectedSection" placeholder="插入区块">
               <el-option
-                v-for="section in sections"
-                :key="section.value"
-                :label="section.label"
-                :value="section.value"
+                v-for="item in sections"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
               />
             </el-select>
-            <el-button type="primary" plain @click="insertSection">
-              <i class="fas fa-plus"></i> 插入区块
+            <el-button type="primary" @click="insertSection">
+              插入
             </el-button>
           </div>
         </div>
 
-        <!-- ====== 编辑器 + 预览 ====== -->
+        <!-- 编辑/预览双栏 -->
         <div class="editor-content">
-          <textarea
-            ref="markdownTextarea"
-            v-model="currentTemplate.content"
-            class="markdown-editor"
-            placeholder="在此输入Markdown格式的报告模板..."
-          ></textarea>
+          <!-- Markdown 编辑器 -->
+          <div class="editor-pane">
+        <textarea
+          ref="markdownTextarea"
+          v-model="currentTemplate.content"
+          class="markdown-editor"
+          spellcheck="false"
+          placeholder="输入Markdown格式的模板内容..."
+        ></textarea>
+          </div>
 
+          <!-- 预览面板 -->
           <div class="preview-pane">
             <div class="preview-header">
-              <h4><i class="fas fa-eye"></i> 实时预览</h4>
+              <el-icon><View /></el-icon>
+              <h4>实时预览</h4>
             </div>
-            <div class="preview-content">
-              <div v-html="renderedContent"></div>
-            </div>
+            <div class="preview-content" v-html="renderedContent"></div>
           </div>
         </div>
       </div>
 
-      <!-- ====== Dialog 底部按钮 ====== -->
+      <!-- 对话框底部按钮 -->
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="editorVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveTemplate">保存模板</el-button>
+          <el-button type="primary" @click="saveTemplate">
+            保存模板
+          </el-button>
         </div>
       </template>
+    </el-dialog>
+
+    <!-- 导入模板对话框 -->
+    <el-dialog
+      v-model="importDialogVisible"
+      title="导入模板"
+      width="500px"
+    >
+      <div class="import-dialog">
+        <p>请选择要导入的模板文件：</p>
+        <el-upload
+          class="import-upload"
+          drag
+          :auto-upload="false"
+          :show-file-list="true"
+          :on-change="handleImportFile"
+          accept=".json"
+        >
+          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <div class="el-upload__text">
+            拖放文件到此处或 <em>点击选择文件</em>
+          </div>
+          <template #tip>
+            <div class="el-upload__tip">
+              仅支持JSON格式文件
+            </div>
+          </template>
+        </el-upload>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { ref, reactive, computed, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, computed, nextTick, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import { UploadFilled, Loading } from '@element-plus/icons-vue'
 
 export default {
+  components: {
+    UploadFilled,
+    Loading
+  },
   setup() {
-    // 报告模板数据
-    const templates = ref([
-      {
-        id: 'tpl-001',
-        name: '标准技术报告',
-        isDefault: true,
-        created: '2023-08-12',
-        content: '# 安全扫描报告\n\n## 扫描概述\n...',
-        preview: `<div class="template-preview-content">
-          <h3>安全扫描报告</h3>
+    const templates = ref([])
+    const loading = ref(false)
+    const importDialogVisible = ref(false)
+    const importFile = ref(null)
 
-          <div class="preview-stats">
-            <span class="stat-item"><i class="fas fa-bug"></i>
- 漏洞: 12</span>
-
-            <span class="stat-item"><i class="fas fa-exclamation-triangle"></i>
- 严重: 3</span>
-
-          </div>
-
-          <div class="preview-sections">
-            <p>扫描概述 | 漏洞列表 | 修复建议</p>
-
-          </div>
-
-        </div>
-`,
-      },
-      {
-        id: 'tpl-002',
-        name: '管理层摘要报告',
-        isDefault: false,
-        created: '2023-09-01',
-        content: '# 安全风险摘要\n\n## 关键发现\n...',
-        preview: `<div class="template-preview-content">
-          <h3>安全风险摘要</h3>
-
-          <div class="preview-stats">
-            <span class="stat-item"><i class="fas fa-chart-pie"></i>
- 风险评级: 高</span>
-
-            <span class="stat-item"><i class="fas fa-clock"></i>
- 预计修复: 3天</span>
-
-          </div>
-
-          <div class="preview-sections">
-            <p>执行摘要 | 风险评级 | 行动计划</p>
-
-          </div>
-
-        </div>
-`,
-      },
-      {
-        id: 'tpl-003',
-        name: '合规审计报告',
-        isDefault: false,
-        created: '2023-09-15',
-        content: '# 合规审计报告\n\n## 审计范围\n...',
-        preview: `<div class="template-preview-content">
-          <h3>合规审计报告</h3>
-
-          <div class="preview-stats">
-            <span class="stat-item"><i class="fas fa-shield-alt"></i>
- 合规项: 28</span>
-
-            <span class="stat-item"><i class="fas fa-times-circle"></i>
- 不合规: 5</span>
-
-          </div>
-
-          <div class="preview-sections">
-            <p>审计范围 | 合规检查 | 改进建议</p>
-
-          </div>
-
-        </div>
-`,
-      },
-    ])
+    // 当前选择的文件夹
+    const currentFolder = ref(null)
+    const defaultTemplateId = ref(null)
 
     const editorVisible = ref(false)
     const editorTitle = ref('编辑报告模板')
@@ -326,12 +303,8 @@ export default {
     ])
     const selectedSection = ref('')
 
-    /* ========== DOM 引用 ========== */
     const markdownTextarea = ref(null)
 
-    /* ========== 文本操作助手 ==========
-       根据光标位置/选区，插入或包装 Markdown 语法
-    ================================== */
     const wrapSelection = (before, after = '') => {
       const el = markdownTextarea.value
       if (!el) return
@@ -373,19 +346,15 @@ export default {
     /* ========== 工具栏行为实现 ========== */
     const makeBold = () => wrapSelection('**', '**')
     const makeItalic = () => wrapSelection('_', '_')
-    // Markdown 本身没下划线，用内联 HTML
     const makeUnderline = () => wrapSelection('<u>', '</u>')
-
     const makeUnorderedList = () => prependLines(() => '- ')
     const makeOrderedList = () => prependLines((i) => `${i + 1}. `)
-
     const insertLink = () => {
       const url = window.prompt('请输入链接 URL')
       if (!url) return
       const text = window.prompt('显示文本（可留空使用 URL）') || url
       wrapSelection(`[${text}](${url})`)
     }
-
     const insertImage = () => {
       const url = window.prompt('请输入图片 URL')
       if (!url) return
@@ -393,9 +362,6 @@ export default {
       wrapSelection(`![${alt}](${url})`)
     }
 
-    /* ========== 插入区块 ==========
-       按 selectedSection 插入 Markdown 片段
-    ================================== */
     const sectionSnippets = {
       summary: `## 扫描概述\n\n- 扫描类型: \n- 扫描范围: \n- 时间范围: \n`,
       vulnerabilities: `## 漏洞清单\n\n| ID | 风险 | 描述 |\n| --- | --- | --- |\n| VUL-001 | 高 | 示例描述 |\n`,
@@ -415,55 +381,466 @@ export default {
       selectedSection.value = ''
     }
 
+    /* ========== 文件系统操作 ========== */
+
+    // 选择模板文件夹
+    const selectTemplateFolder = async () => {
+      try {
+        const handle = await window.showDirectoryPicker({
+          id: 'scanTemplateFolder',
+          mode: 'readwrite'
+        });
+
+        // 验证权限
+        if (await verifyPermission(handle, true)) {
+          currentFolder.value = handle;
+          // 保存文件夹处理程序以供后续使用
+          localStorage.setItem('lastTemplateFolderHandle', JSON.stringify({
+            name: handle.name
+          }));
+
+          // 加载模板
+          loadTemplates();
+        }
+      } catch (error) {
+        console.error('选择文件夹失败:', error);
+        ElMessage.error(`选择文件夹失败: ${error.message || '用户取消操作'}`);
+      }
+    }
+
+    // 验证文件夹权限
+    const verifyPermission = async (handle, readWrite) => {
+      const options = {};
+      if (readWrite) {
+        options.mode = 'readwrite';
+      }
+
+      if (await handle.queryPermission(options) === 'granted') {
+        return true;
+      }
+
+      if (await handle.requestPermission(options) === 'granted') {
+        return true;
+      }
+
+      return false;
+    }
+
+    // 加载模板
+    const loadTemplates = async () => {
+      if (!currentFolder.value) return;
+
+      loading.value = true;
+      templates.value = [];
+      defaultTemplateId.value = null;
+
+      try {
+        // 检查默认模板文件
+        let defaultFile;
+        try {
+          defaultFile = await currentFolder.value.getFileHandle('default.json', { create: true });
+        } catch (error) {
+          console.error('获取默认模板文件失败:', error);
+        }
+
+        // 读取默认模板ID
+        if (defaultFile) {
+          const defaultFileContent = await readFile(defaultFile);
+          if (defaultFileContent) {
+            try {
+              const defaultData = JSON.parse(defaultFileContent);
+              defaultTemplateId.value = defaultData.defaultTemplateId;
+            } catch (parseError) {
+              console.warn('解析默认模板文件失败:', parseError);
+            }
+          }
+        }
+
+        // 遍历文件夹，寻找模板文件
+        for await (const entry of currentFolder.value.values()) {
+          if (entry.kind === 'file' && entry.name.startsWith('tpl-') && entry.name.endsWith('.json')) {
+            try {
+              const fileHandle = entry;
+              const templateContent = await readFile(fileHandle);
+
+              if (templateContent) {
+                try {
+                  const template = JSON.parse(templateContent);
+
+                  // 关键修复：从文件名中提取纯净的ID
+                  // 文件名格式应为 tpl-<数字ID>.json
+                  const pureId = entry.name
+                    .replace('tpl-', '')  // 去除 tpl- 前缀
+                    .replace('.json', ''); // 去除 .json 后缀
+
+                  // 使用纯净ID作为模板ID
+                  template.id = pureId;
+
+                  // 标记是否为默认模板
+                  template.isDefault = (pureId === defaultTemplateId.value);
+
+                  templates.value.push(template);
+                } catch (parseError) {
+                  console.error(`解析模板文件 ${entry.name} 失败:`, parseError);
+                }
+              }
+            } catch (fileError) {
+              console.error(`读取模板文件 ${entry.name} 失败:`, fileError);
+            }
+          }
+        }
+
+        // 按创建时间排序
+        templates.value.sort((a, b) =>
+          new Date(b.created).getTime() - new Date(a.created).getTime()
+        );
+
+        ElMessage.success(`已加载 ${templates.value.length} 个模板`);
+      } catch (error) {
+        console.error('加载模板失败:', error);
+        ElMessage.error(`加载模板失败: ${error.message}`);
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    // 文件读取工具函数
+    const readFile = async (fileHandle) => {
+      try {
+        const file = await fileHandle.getFile();
+        return await file.text();
+      } catch (error) {
+        console.error('读取文件失败:', error);
+        ElMessage.error(`读取文件失败: ${error.message}`);
+        return null;
+      }
+    }
+
+    // 保存模板到文件
+    const saveTemplateToFile = async (template) => {
+      if (!currentFolder.value) {
+        ElMessage.warning('请先选择模板文件夹');
+        return false;
+      }
+
+      try {
+        const cleanId = template.id.replace('tpl-', ''); // 移除已有前缀
+        const fileName = `tpl-${cleanId}.json`; // 添加标准前缀
+        // 创建或获取文件句柄
+        const fileHandle = await currentFolder.value.getFileHandle(fileName, {
+          create: true
+        });
+
+        // 获取写入权限
+        if (!(await verifyPermission(fileHandle, true))) {
+          ElMessage.error('没有文件写入权限');
+          return false;
+        }
+
+        // 写入内容
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(template, null, 2));
+        await writable.close();
+
+        return true;
+      } catch (error) {
+        console.error('保存模板失败:', error);
+        ElMessage.error(`保存模板失败: ${error.message}`);
+        return false;
+      }
+    }
+
+    // 保存默认模板ID
+    const saveDefaultTemplate = async (templateId) => {
+      if (!currentFolder.value) return;
+
+      try {
+        const defaultFile = await currentFolder.value.getFileHandle('default.json', { create: true });
+
+        // 获取写入权限
+        if (!(await verifyPermission(defaultFile, true))) {
+          return false;
+        }
+
+        // 写入内容
+        const writable = await defaultFile.createWritable();
+        await writable.write(JSON.stringify({ defaultTemplateId: templateId }, null, 2));
+        await writable.close();
+
+        defaultTemplateId.value = templateId;
+        return true;
+      } catch (error) {
+        console.error('设置默认模板失败:', error);
+        ElMessage.error(`设置默认模板失败: ${error.message}`);
+        return false;
+      }
+    }
+
+    // 删除模板文件
+    const deleteTemplateFile = async (template) => {
+      if (!currentFolder.value) return false;
+
+      try {
+        const fileName = `tpl-${template.id}.json`;
+
+        // 尝试获取文件句柄
+        let fileHandle;
+        try {
+          fileHandle = await currentFolder.value.getFileHandle(fileName);
+        } catch {
+          return true; // 文件不存在，视为删除成功
+        }
+
+        // 检查删除权限
+        if (!currentFolder.value.removeEntry) {
+          ElMessage.error('您的浏览器不支持文件删除操作');
+          return false;
+        }
+
+        // 删除文件
+        await currentFolder.value.removeEntry(fileName);
+        return true;
+      } catch (error) {
+        console.error('删除模板文件失败:', error);
+        ElMessage.error(`删除模板文件失败: ${error.message}`);
+        return false;
+      }
+    }
+
     /* ========== 模板 CRUD ========== */
     const createNewTemplate = () => {
+      if (!currentFolder.value) {
+        ElMessage.warning('请先选择模板文件夹');
+        return;
+      }
+
       editorTitle.value = '创建新模板'
       resetCurrentTemplate()
       editorVisible.value = true
     }
 
     const editTemplate = (tpl) => {
+      const standardizedTpl = {
+        ...tpl,
+        id: tpl.id.replace('tpl-', '')
+      };
       editorTitle.value = '编辑模板'
-      Object.assign(currentTemplate, tpl)
+      Object.assign(currentTemplate, standardizedTpl);
       editorVisible.value = true
       nextTick(() => markdownTextarea.value?.focus())
     }
 
-    const saveTemplate = () => {
+    const saveTemplate = async () => {
       if (!currentTemplate.id) {
-        currentTemplate.id = `tpl-${Date.now()}`
-        currentTemplate.created = new Date().toLocaleDateString()
-        templates.value.push({ ...currentTemplate })
-      } else {
-        const idx = templates.value.findIndex((t) => t.id === currentTemplate.id)
-        if (idx !== -1) templates.value[idx] = { ...currentTemplate }
+        currentTemplate.id = Date.now().toString(); // 更简单的ID生成方式
+        currentTemplate.created = new Date().toISOString();
       }
-      editorVisible.value = false
+
+      // 更新预览HTML
+      currentTemplate.preview = generatePreviewHtml(currentTemplate.name);
+
+      try {
+        // 保存到文件系统
+        const saveSuccess = await saveTemplateToFile(currentTemplate);
+
+        if (saveSuccess) {
+          if (currentTemplate.isDefault) {
+            await setAsDefault(currentTemplate);
+          }
+
+          // 更新本地列表
+          const index = templates.value.findIndex(t => t.id === currentTemplate.id);
+          if (index !== -1) {
+            templates.value[index] = { ...currentTemplate };
+          } else {
+            templates.value.push({ ...currentTemplate });
+          }
+
+          ElMessage.success('模板保存成功');
+          editorVisible.value = false;
+        }
+      } catch (error) {
+        console.error('保存模板过程中出错:', error);
+        ElMessage.error('模板保存失败');
+      }
     }
 
-    const setAsDefault = (tpl) => {
-      templates.value.forEach((t) => (t.isDefault = t.id === tpl.id))
+    const setAsDefault = async (tpl) => {
+      try {
+        const success = await saveDefaultTemplate(tpl.id);
+        if (success) {
+          templates.value.forEach(t => {
+            t.isDefault = t.id === tpl.id;
+          });
+          ElMessage.success(`已将 "${tpl.name}" 设为默认模板`);
+        }
+      } catch (error) {
+        console.error('设置默认模板过程中出错:', error);
+        ElMessage.error('设置默认模板失败');
+      }
     }
 
-    const deleteTemplate = (tpl) => {
-      templates.value = templates.value.filter((t) => t.id !== tpl.id)
-      if (tpl.isDefault && templates.value.length) templates.value[0].isDefault = true
+    const deleteTemplate = async (tpl) => {
+      try {
+        ElMessageBox.confirm(
+          `确定要删除模板 "${tpl.name}" 吗？此操作无法撤销。`,
+          '删除确认',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then(async () => {
+          const deleteSuccess = await deleteTemplateFile(tpl);
+
+          if (deleteSuccess) {
+            // 如果是默认模板，清除默认设置
+            if (tpl.isDefault) {
+              await saveDefaultTemplate(null);
+              defaultTemplateId.value = null;
+            }
+
+            // 从列表中移除
+            templates.value = templates.value.filter(t => t.id !== tpl.id);
+
+            // 如果列表不为空，设置第一个为默认
+            if (tpl.isDefault && templates.value.length > 0) {
+              await setAsDefault(templates.value[0]);
+            }
+
+            ElMessage.success('模板删除成功');
+          }
+        }).catch(() => {
+          // 用户取消
+        });
+      } catch (error) {
+        console.error('删除模板过程中出错:', error);
+        ElMessage.error('模板删除失败');
+      }
     }
 
     const resetCurrentTemplate = () => {
+      const newId = Date.now().toString().slice(-5);
       Object.assign(currentTemplate, {
-        id: '',
+        id: newId,
         name: '未命名模板',
         content: '# 报告标题\n\n## 章节标题\n...',
         isDefault: false,
-        created: '',
-      })
+        created: new Date().toISOString(),
+        preview: generatePreviewHtml('未命名模板'),
+      });
     }
 
-    const importTemplate = () => ElMessage.info('导入功能开发中')
-    const exportAllTemplates = () => ElMessage.success('所有模板已导出')
+    // 生成模板预览HTML
+    const generatePreviewHtml = (templateName) => {
+      return `
+        <div class="template-preview-content">
+          <h3>${templateName}</h3>
+          <div class="preview-stats">
+            <span class="stat-item"><i class="fas fa-bug"></i> 漏洞: 0</span>
+            <span class="stat-item"><i class="fas fa-chart-pie"></i> 风险评级: 中</span>
+          </div>
+          <div class="preview-sections">
+            <p>扫描概述 | 漏洞列表 | 修复建议 | 合规检查</p>
+          </div>
+        </div>
+      `;
+    }
 
-    /* ========== 导出到模板 ========== */
+    // 导入模板对话框
+    const importTemplate = () => {
+      importDialogVisible.value = true;
+    }
+
+    // 处理导入文件
+    const handleImportFile = (file) => {
+      importFile.value = file.raw;
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const importedTemplate = JSON.parse(e.target.result);
+
+          // 验证模板结构
+          if (!importedTemplate.id || !importedTemplate.name || !importedTemplate.content) {
+            throw new Error('无效的模板格式');
+          }
+
+          // 生成预览
+          importedTemplate.preview = generatePreviewHtml(importedTemplate.name);
+
+          // 保存到文件系统
+          const saveSuccess = await saveTemplateToFile(importedTemplate);
+
+          if (saveSuccess) {
+            templates.value.push(importedTemplate);
+            ElMessage.success(`模板 "${importedTemplate.name}" 导入成功`);
+            importDialogVisible.value = false;
+          }
+        } catch (error) {
+          console.error('导入模板失败:', error);
+          ElMessage.error(`导入失败: ${error.message || '文件格式无效'}`);
+        }
+      };
+
+      reader.readAsText(importFile.value);
+    }
+
+    // 导出所有模板
+    const exportAllTemplates = async () => {
+      if (templates.value.length === 0) {
+        ElMessage.warning('没有模板可导出');
+        return;
+      }
+
+      try {
+        const handle = await window.showDirectoryPicker({
+          mode: 'readwrite',
+          suggestedName: '扫描报告模板'
+        });
+
+        if (await verifyPermission(handle, true)) {
+          // 创建导出文件夹
+          const exportFolderName = `模板导出-${new Date().toISOString().slice(0, 10)}`;
+          const exportFolder = await handle.getDirectoryHandle(exportFolderName, { create: true });
+
+          // 导出每个模板
+          for (const template of templates.value) {
+            const fileHandle = await exportFolder.getFileHandle(`tpl-${template.id}.json`, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(JSON.stringify(template, null, 2));
+            await writable.close();
+          }
+
+          // 导出默认模板设置
+          if (defaultTemplateId.value) {
+            const defaultFile = await exportFolder.getFileHandle('default.json', { create: true });
+            const writable = await defaultFile.createWritable();
+            await writable.write(JSON.stringify({ defaultTemplateId: defaultTemplateId.value }));
+            await writable.close();
+          }
+
+          ElMessage.success(`已导出 ${templates.value.length} 个模板到文件夹 "${exportFolderName}"`);
+        }
+      } catch (error) {
+        console.error('导出模板失败:', error);
+        ElMessage.error(`导出失败: ${error.message || '用户取消操作'}`);
+      }
+    }
+
+    // 初始化：检查是否有上次使用的文件夹
+    onMounted(() => {
+      const lastFolder = localStorage.getItem('lastTemplateFolderHandle');
+      if (lastFolder) {
+        try {
+          const folderInfo = JSON.parse(lastFolder);
+          document.querySelector('.action-button.folder').click();
+        } catch (error) {
+          console.error('解析上次文件夹失败:', error);
+        }
+      }
+    })
+
     return {
       templates,
       editorVisible,
@@ -473,6 +850,9 @@ export default {
       selectedSection,
       renderedContent,
       markdownTextarea,
+      loading,
+      importDialogVisible,
+      currentFolder,
 
       // toolbar
       makeBold,
@@ -492,6 +872,9 @@ export default {
       deleteTemplate,
       importTemplate,
       exportAllTemplates,
+      handleImportFile,
+      selectTemplateFolder,
+      loadTemplates,
     }
   },
 }
