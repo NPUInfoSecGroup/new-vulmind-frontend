@@ -7,6 +7,11 @@ console.log('Base URL:', base) // 输出当前的 BASE_URL，便于调试
 
 const routes = [
   {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/views/ScanHistory.vue'),
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('@/views/ScanHistory.vue'),
