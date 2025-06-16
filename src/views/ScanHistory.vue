@@ -285,24 +285,32 @@ export default {
     const loading = ref(true)
 
     // 加载扫描历史数据
-    const loadScanHistory = () => {
+    const loadScanHistory = async () => {
       try {
-        loading.value = true
+        loading.value = true;
 
-        // ① webpack 会在构建时扫描目录
-        const ctx = require.context('@/scan-details', false, /^\.\/scan-\d{10}\.json$/)
+        // 使用 Vite 的 glob 导入功能
+        const modules = import.meta.glob('/src/scan-details/scan-*.json');
 
-        scanHistory.value = ctx
-          .keys()
-          .map((k) => ctx(k))
-          .sort((a, b) => b.id.localeCompare(a.id))
+        // 加载所有匹配的文件
+        const scanFiles = await Promise.all(
+          Object.keys(modules).map(async (path) => {
+            const module = await modules[path]();
+            return module.default || module;
+          })
+        );
+
+        scanHistory.value = scanFiles
+          .filter(Boolean)
+          .sort((a, b) => b.id.localeCompare(a.id));
+
       } catch (e) {
-        console.error(e)
-        ElMessage.error('加载扫描记录失败')
+        console.error('加载扫描记录失败:', e);
+        ElMessage.error('加载扫描记录失败: ' + e.message);
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
 
     // 组件挂载时加载数据
     onMounted(() => {
