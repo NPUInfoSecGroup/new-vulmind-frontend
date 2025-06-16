@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Dashboard from '../views/Home/Dashboard.vue'
 
 const base = import.meta.env.BASE_URL
@@ -47,7 +47,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(base), // 使用 HTML5 History 模式
+  history: createWebHashHistory(base), // 使用 HTML5 History 模式
   routes,
 })
 router.beforeEach((to, from, next) => {
