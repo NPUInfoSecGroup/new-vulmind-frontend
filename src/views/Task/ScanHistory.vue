@@ -66,9 +66,10 @@
         v-for="(row, index) in filteredHistory"
         :key="index"
         :xs="24"
-        :sm="12"
-        :md="8"
-        :lg="6"
+        :sm="24"
+        :md="12"
+        :lg="12"
+        :xl="8"
       >
         <el-card class="scan-history-card" shadow="hover">
           <div class="scanner-header">
@@ -517,8 +518,7 @@ h1 {
   flex-wrap: nowrap;
 }
 label.filter-label {
-  width: 25rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 .filter-row {
   display: flex;
