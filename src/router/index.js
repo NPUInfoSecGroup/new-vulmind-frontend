@@ -25,6 +25,11 @@ const routes = [
     name: 'ReportTemplates',
     component: () => import('../views/ReportTemplate.vue'),
   },
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import('../views/MessageView.vue'),
+  },
 ]
 
 const router = createRouter({
