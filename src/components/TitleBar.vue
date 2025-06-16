@@ -11,7 +11,7 @@
     </el-menu-item>
     <el-menu-item index="1" @click="goScanHistory">扫描历史</el-menu-item>
     <el-menu-item index="2" @click="goDocument">报告生成</el-menu-item>
-    <el-menu-item index="3" @click="goChat">聊天界面</el-menu-item>
+    <!-- <el-menu-item index="3" @click="goChat">聊天界面</el-menu-item> -->
     <el-menu-item index="-1" @click="goConfigList">用户配置</el-menu-item>
   </el-menu>
 </template>
@@ -37,10 +37,10 @@ const goDocument = () => {
   router.push('/report-templates')
   activeIndex.value = '2'
 }
-const goChat = () => {
-  router.push('/chat')
-  activeIndex.value = '2'
-}
+// const goChat = () => {
+//   router.push('/chat')
+//   activeIndex.value = '2'
+// }
 const goConfigList = () => {
   router.push('/config')
   activeIndex.value = '-1'
@@ -54,7 +54,7 @@ const handleSelect = (key: string) => {
 </script>
 
 <style scoped>
-.el-menu--horizontal > .el-menu-item:nth-child(5) {
+.el-menu--horizontal > .el-menu-item:nth-child(4) {
   margin-left: auto;
 }
 /* 示例代码 */
