@@ -1,0 +1,28 @@
+{
+  "id": "scan-2023091501",
+  "date": "2023-09-15",
+  "time": "14:30:22",
+  "target": "https://example.com",
+  "type": "web",
+  "status": "completed",
+  "vulnSummary": {
+    "critical": 3,
+    "high": 7,
+    "medium": 12,
+    "low": 5
+  },
+  "vulnerabilities": [
+    {
+      "id": "vuln-001",
+      "name": "SQL注入漏洞",
+      "severity": "critical",
+      "description": "在登录接口发现SQL注入漏洞"
+    },
+    {
+      "id": "vuln-002",
+      "name": "XSS跨站脚本",
+      "severity": "high",
+      "description": "在用户反馈表单中发现存储型XSS漏洞"
+    }
+  ]
+}

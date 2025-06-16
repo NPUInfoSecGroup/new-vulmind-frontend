@@ -1,0 +1,28 @@
+{
+  "id": "scan-2023091401",
+  "date": "2023-09-14",
+  "time": "10:15:45",
+  "target": "file:app_v1.2.0.exe",
+  "type": "binary",
+  "status": "completed",
+  "vulnSummary": {
+    "critical": 0,
+    "high": 2,
+    "medium": 5,
+    "low": 8
+  },
+  "vulnerabilities": [
+    {
+      "id": "vuln-101",
+      "name": "缓冲区溢出漏洞",
+      "severity": "high",
+      "description": "在文件解析模块发现缓冲区溢出漏洞"
+    },
+    {
+      "id": "vuln-102",
+      "name": "权限提升漏洞",
+      "severity": "medium",
+      "description": "在服务管理模块发现权限提升漏洞"
+    }
+  ]
+}
