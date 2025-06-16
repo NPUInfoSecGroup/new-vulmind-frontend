@@ -559,7 +559,7 @@ body {
     width: 100%;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border);
-    border-radius: 1rem;
+    border-radius: .8rem;
     padding: 10px 12px;
 
 }
@@ -575,4 +575,38 @@ button.el-button.is-circle {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border);
     border-radius: 10rem;
+}
+
+.el-select__wrapper {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    border-radius: .8rem;
+    padding: 10px 12px;
+}
+
+.el-select__placeholder {
+    color: #ffffff;
+}
+
+.el-select-dropdown__wrap,
+.el-scrollbar,
+.el-select-dropdown__list,
+.el-select-dropdown__item,
+.el-select-dropdown,
+.el-popper.is-light,
+.el-popper.is-light>.el-popper__arrow:before {
+    background-color: #0c1b2400;
+    border-radius: .5rem;
+    backdrop-filter: blur(10px);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.el-select-dropdown__list {
+    padding: 10px;
+}
+
+.el-select-dropdown__item.is-hovering {
+    background-color: #1c2e53be;
 }

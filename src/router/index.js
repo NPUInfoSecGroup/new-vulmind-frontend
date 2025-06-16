@@ -18,17 +18,22 @@ const routes = [
   {
     path: '/scan-history',
     name: 'ScanHistory',
-    component: () => import('../views/ScanHistory.vue'),
+    component: () => import('@/views/ScanHistory.vue'),
   },
   {
     path: '/report-templates',
     name: 'ReportTemplates',
-    component: () => import('../views/ReportTemplate.vue'),
+    component: () => import('@/views/ReportTemplate.vue'),
   },
   {
     path: '/chat',
     name: 'Chat',
-    component: () => import('../views/MessageView.vue'),
+    component: () => import('@/views/MessageView.vue'),
+  },
+  {
+    path: '/config',
+    name: 'Config',
+    component: () => import('@/views/UserConfigPage.vue'), // 显示扫描页内容
   },
 ]
 
