@@ -8,10 +8,6 @@ console.log('Base URL:', base) // 输出当前的 BASE_URL，便于调试
 const routes = [
   {
     path: '/',
-    redirect: '/dashboard',
-  },
-  {
-    path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
   },
