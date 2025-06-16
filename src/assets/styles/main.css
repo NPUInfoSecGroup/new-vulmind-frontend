@@ -182,6 +182,7 @@ body {
 .scan-slider {
     flex-grow: 1;
     -webkit-appearance: none;
+    appearance: none;
     height: 6px;
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.1);
@@ -629,4 +630,23 @@ button.el-button.el-button--primary {
 .el-menu--horizontal .el-menu-item:not(.is-disabled):focus,
 .el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
     background-color: #021d3000;
+}
+
+.el-range-editor.el-input__wrapper,
+.el-select__wrapper {
+    height: 3rem;
+    width: 100%;
+}
+
+.el-empty {
+    --el-empty-fill-color-0: var(--el-color-black);
+    --el-empty-fill-color-1: #4b4b52;
+    --el-empty-fill-color-2: #36383d;
+    --el-empty-fill-color-3: #1e1e20;
+    --el-empty-fill-color-4: #262629;
+    --el-empty-fill-color-5: #202124;
+    --el-empty-fill-color-6: #212224;
+    --el-empty-fill-color-7: #1b1c1f;
+    --el-empty-fill-color-8: #1c1d1f;
+    --el-empty-fill-color-9: #18181a;
 }

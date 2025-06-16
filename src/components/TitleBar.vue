@@ -7,7 +7,7 @@
     @select="handleSelect"
   >
     <el-menu-item index="0" @click="goHome">
-      <img style="height: 30px" src="@/assets/favicon.ico" alt="Element logo" />
+      <img style="height: 40px" src="@/assets/logo.png" alt="Element logo" />
     </el-menu-item>
     <el-menu-item index="1" @click="goScanHistory">扫描历史</el-menu-item>
     <el-menu-item index="2" @click="goDocument">报告生成</el-menu-item>

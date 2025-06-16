@@ -12,163 +12,56 @@
 
     <!-- 过滤和搜索区域美化 -->
     <div class="filter-card">
-      <div class="filter-section">
-        <el-form :inline="true" :model="filterForm">
-          <div class="filter-row">
-            <el-form-item label="扫描目标">
-              <el-input
-                v-model="filterForm.target"
-                placeholder="输入URL或关键词"
-                class="filter-input"
-              >
-                <template #prefix>
-                  <i class="fas fa-bullseye"></i>
-                </template>
-              </el-input>
-            </el-form-item>
-
-            <el-form-item label="日期范围">
-              <el-date-picker
-                v-model="filterForm.dateRange"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                value-format="YYYY-MM-DD"
-                class="filter-date-picker"
-              >
-                <template #prefix>
-                  <i class="fas fa-calendar"></i>
-                </template>
-              </el-date-picker>
-            </el-form-item>
+      <el-row :gutter="20">
+        <el-col :xs="24" :sm="12" :md="8">
+          <div class="filter-item">
+            <label class="filter-label">扫描目标</label>
+            <el-input
+              v-model="filterForm.target"
+              placeholder="输入URL或关键词"
+              class="filter-input"
+            >
+              <template #prefix>
+                <i class="fas fa-bullseye"></i>
+              </template>
+            </el-input>
           </div>
+        </el-col>
 
-          <div class="filter-row">
-            <el-form-item label="状态">
-              <el-select v-model="filterForm.status" placeholder="选择状态" class="filter-select">
-                <el-option label="全部" value=""></el-option>
-                <el-option label="已完成" value="completed"></el-option>
-                <el-option label="失败" value="failed"></el-option>
-                <el-option label="进行中" value="scanning"></el-option>
-              </el-select>
-            </el-form-item>
-
-            <el-form-item>
-              <el-button type="primary" @click="searchHistory" class="filter-button primary">
-                <i class="fas fa-search"></i> 搜索
-              </el-button>
-              <el-button @click="resetFilter" class="filter-button secondary">
-                <i class="fas fa-undo"></i> 重置
-              </el-button>
-            </el-form-item>
+        <el-col :xs="24" :sm="12" :md="8">
+          <div class="filter-item">
+            <label class="filter-label">日期范围</label>
+            <el-date-picker
+              v-model="filterForm.dateRange"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              value-format="YYYY-MM-DD"
+              class="filter-date-picker"
+            >
+              <template #prefix>
+                <i class="fas fa-calendar"></i>
+              </template>
+            </el-date-picker>
           </div>
-        </el-form>
-      </div>
+        </el-col>
+
+        <el-col :xs="24" :sm="12" :md="8">
+          <div class="filter-item">
+            <label class="filter-label">状态</label>
+            <el-select v-model="filterForm.status" placeholder="选择状态" class="filter-select">
+              <el-option label="全部" value="" />
+              <el-option label="已完成" value="completed" />
+              <el-option label="失败" value="failed" />
+              <el-option label="进行中" value="scanning" />
+            </el-select>
+          </div>
+        </el-col>
+      </el-row>
     </div>
 
-    <!-- 历史记录列表美化 -->
-    <!-- <div class="history-card">
-      <div class="history-list">
-        <el-table
-          :data="filteredHistory"
-          style="width: 100%"
-          class="scan-history-table"
-          row-class-name="scan-row"
-          header-row-class-name="header-row"
-          @row-click="handleRowClick"
-        >
-          <el-table-column prop="date" label="扫描日期" width="180">
-            <template #default="{ row }">
-              <div class="date-container">
-                <div class="date-value">{{ row.date }}</div>
-                <div class="time-value">{{ row.time }}</div>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="target" label="扫描目标">
-            <template #default="{ row }">
-              <div class="target-container">
-                <i class="fas" :class="row.type === 'web' ? 'fa-globe' : 'fa-file-code'"></i>
-                <span>{{ row.target }}</span>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="type" label="扫描类型" width="120">
-            <template #default="{ row }">
-              <el-tag
-                :type="row.type === 'web' ? 'success' : 'info'"
-                class="scan-type-tag"
-                effect="dark"
-                round
-              >
-                {{ row.type === 'web' ? 'Web扫描' : '二进制扫描' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="结果概要" width="180">
-            <template #default="{ row }">
-              <div class="vuln-summary">
-                <div class="vuln-item critical" v-if="row.vulnSummary.critical > 0">
-                  <span class="vuln-count">{{ row.vulnSummary.critical }}</span>
-                  <span class="vuln-label">严重</span>
-                </div>
-                <div class="vuln-item high" v-if="row.vulnSummary.high > 0">
-                  <span class="vuln-count">{{ row.vulnSummary.high }}</span>
-                  <span class="vuln-label">高危</span>
-                </div>
-                <div class="vuln-item medium" v-if="row.vulnSummary.medium > 0">
-                  <span class="vuln-count">{{ row.vulnSummary.medium }}</span>
-                  <span class="vuln-label">中危</span>
-                </div>
-                <div class="vuln-item low" v-if="row.vulnSummary.low > 0">
-                  <span class="vuln-count">{{ row.vulnSummary.low }}</span>
-                  <span class="vuln-label">低危</span>
-                </div>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="操作" width="240" fixed="right">
-            <template #default="{ row }">
-              <div class="action-buttons">
-                <el-button
-                  size="small"
-                  class="action-button tech-details"
-                  @click.stop="viewTechnicalDetails(row)"
-                >
-                  <i class="fas fa-search"></i> 技术细节
-                </el-button>
-                <el-button
-                  size="small"
-                  type="primary"
-                  class="action-button generate-report"
-                  @click.stop="generateReport(row)"
-                >
-                  <i class="fas fa-file-pdf"></i> 生成报告
-                </el-button>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <div class="pagination-section">
-          <el-pagination
-            background
-            layout="prev, pager, next, jumper"
-            :total="totalItems"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            @current-change="handlePageChange"
-            class="history-pagination"
-          />
-        </div>
-      </div>
-    </div> -->
-    <el-row :gutter="20" class="scan-history-cards">
+    <el-row :gutter="20" class="scan-history-cards" v-if="filteredHistory.length > 0" s>
       <el-col
         v-for="(row, index) in filteredHistory"
         :key="index"
@@ -182,9 +75,9 @@
             <div class="name">
               {{ row.name || `扫描记录 ${index + 1}` }}
               <el-tag
-                :type="row.type === 'web' ? 'success' : 'info'"
+                :type="row.type === 'web' ? 'primary' : 'warning'"
                 class="scan-type-tag"
-                effect="dark"
+                effect="Plain"
               >
                 {{ row.type === 'web' ? 'Web扫描' : '二进制扫描' }}
               </el-tag>
@@ -228,19 +121,7 @@
         </el-card>
       </el-col>
     </el-row>
-
-    <!-- 分页控件 -->
-    <!-- <div class="pagination-section">
-      <el-pagination
-        background
-        layout="prev, pager, next, jumper"
-        :total="totalItems"
-        :page-size="pageSize"
-        :current-page="currentPage"
-        @current-change="handlePageChange"
-        class="history-pagination"
-      />
-    </div> -->
+    <el-empty v-else description="暂无扫描记录" image-size="160" class="empty-placeholder" />
 
     <el-dialog
       v-model="detailDialogVisible"
@@ -619,8 +500,26 @@ h1 {
 
 .filter-section {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1rem;
 }
-
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-content: center;
+  flex-wrap: nowrap;
+}
+label.filter-label {
+  width: 25rem;
+  margin-bottom: 1rem;
+}
 .filter-row {
   display: flex;
   flex-wrap: wrap;

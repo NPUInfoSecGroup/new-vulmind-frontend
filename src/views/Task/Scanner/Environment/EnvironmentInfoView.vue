@@ -11,9 +11,7 @@
             </el-tag>
           </div>
           <div class="action">
-            <el-button type="primary" @click="$router.push('/scan/' + task.name)">
-              查看任务
-            </el-button>
+            <el-button type="primary" @click=""> 执行任务 </el-button>
           </div>
         </div>
         <el-scrollbar>
