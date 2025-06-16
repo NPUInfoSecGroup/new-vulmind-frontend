@@ -4,7 +4,7 @@
     <header class="app-header">
       <div class="header-content">
         <h1 class="app-title">
-          <i class="fas fa-shield-alt" />
+          <!-- <i class="fas fa-shield-alt" /> -->
           VulMind
         </h1>
         <p class="app-subtitle">可拓展大模型漏洞扫描平台</p>
@@ -12,38 +12,17 @@
     </header>
 
     <!-- 主内容区 -->
-    <main class="dashboard-content">
-      <ScanTarget />
-      <ScanStatus />
-
-      <ReportGenerator />
-    </main>
+    <ScannerQuicker />
+    <ReportGenerator />
   </div>
 </template>
 
-<script>
-import ScanTarget from '@/views/Home/ScanTarget.vue'
-import ScanStatus from '@/views/Home/ScanStatus.vue'
+<script setup>
 import ReportGenerator from '@/views/Home/ReportGenerator.vue'
-
-export default {
-  name: 'Dashboard',
-  components: {
-    ScanTarget,
-    ScanStatus,
-    ReportGenerator,
-  },
-}
+import ScannerQuicker from './ScannerQuicker.vue'
 </script>
 
 <style scoped>
-/***********************************
- * 调色板 & 全局变量
- ***********************************
-
-/***********************************
- * 页面骨架
- ***********************************/
 .dashboard-container {
   display: flex;
   flex-direction: column;
@@ -55,6 +34,7 @@ export default {
   position: relative;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
+  gap: 20px;
 }
 
 .dashboard-container::before {

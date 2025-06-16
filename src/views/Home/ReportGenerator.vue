@@ -44,11 +44,7 @@
           <div class="select-row">
             <div class="select-label">扫描记录：</div>
             <select v-model="selectedRecordId" class="select-input" @change="handleScanSelection">
-              <option
-                v-for="rec in scanHistory"
-                :key="rec.id"
-                :value="rec.id"
-              >
+              <option v-for="rec in scanHistory" :key="rec.id" :value="rec.id">
                 {{ rec.date }} - {{ rec.id }} ({{ scanTypeLabel(rec.type) }})
               </option>
             </select>
@@ -117,10 +113,7 @@
               <div class="summary-label">扫描状态:</div>
               <div class="summary-value">{{ scanStatusText }}</div>
             </div>
-            <div
-              v-if="criticalVulns.length > 0"
-              class="summary-item"
-            >
+            <div v-if="criticalVulns.length > 0" class="summary-item">
               <div class="summary-label">严重漏洞详情:</div>
               <div class="summary-value">
                 <ul class="critical-vuln-list">
@@ -148,9 +141,9 @@ export default {
       type: Array,
       default: () => [
         { id: 'std', value: 'standard', name: '标准模板' },
-        { id: 'pro', value: 'professional', name: '专业模板' }
-      ]
-    }
+        { id: 'pro', value: 'professional', name: '专业模板' },
+      ],
+    },
   },
   setup() {
     // 扫描历史记录
@@ -165,7 +158,7 @@ export default {
       type: '',
       status: '',
       vulnSummary: {},
-      vulnerabilities: []
+      vulnerabilities: [],
     })
 
     // 加载状态
@@ -175,15 +168,17 @@ export default {
     const selectedReportTemplate = ref('standard')
     const selectedRecordId = ref(null)
     const reporterName = ref('系统管理员')
-    const currentDate = ref(new Date().toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }))
+    const currentDate = ref(
+      new Date().toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+    )
 
     // 严重漏洞列表
     const criticalVulns = computed(() => {
-      return currentScan.vulnerabilities?.filter(v => v.severity === 'critical') || []
+      return currentScan.vulnerabilities?.filter((v) => v.severity === 'critical') || []
     })
 
     // 扫描持续时间的文本表示
@@ -202,20 +197,27 @@ export default {
 
     // 扫描状态文本
     const scanStatusText = computed(() => {
-      switch(currentScan.status) {
-        case 'completed': return '已完成'
-        case 'failed': return '失败'
-        case 'scanning': return '进行中'
-        default: return currentScan.status || '未知状态'
+      switch (currentScan.status) {
+        case 'completed':
+          return '已完成'
+        case 'failed':
+          return '失败'
+        case 'scanning':
+          return '进行中'
+        default:
+          return currentScan.status || '未知状态'
       }
     })
 
     // 扫描类型标签
     const scanTypeLabel = (type) => {
-      switch(type) {
-        case 'web': return 'Web扫描'
-        case 'binary': return '二进制扫描'
-        default: return type || '未知类型'
+      switch (type) {
+        case 'web':
+          return 'Web扫描'
+        case 'binary':
+          return '二进制扫描'
+        default:
+          return type || '未知类型'
       }
     }
 
@@ -225,11 +227,11 @@ export default {
         loading.value = true
 
         // 使用 Vite 的 glob 导入功能
-        const modules = import.meta.glob('/src/scan-details/scan-*.json', { eager: true });
+        const modules = import.meta.glob('/src/scan-details/scan-*.json', { eager: true })
 
         // 提取扫描文件
         scanHistory.value = Object.values(modules)
-          .map(module => module.default)
+          .map((module) => module.default)
           .filter(Boolean)
           .sort((a, b) => b.id.localeCompare(a.id))
 
@@ -250,7 +252,7 @@ export default {
     const handleScanSelection = () => {
       if (!selectedRecordId.value) return
 
-      const record = scanHistory.value.find(r => r.id === selectedRecordId.value)
+      const record = scanHistory.value.find((r) => r.id === selectedRecordId.value)
       if (!record) {
         ElMessage.error('扫描记录不存在')
         return
@@ -296,9 +298,9 @@ export default {
       generateReport,
       saveReport,
       exportReport,
-      shareReport
+      shareReport,
     }
-  }
+  },
 }
 </script>
 
@@ -323,7 +325,7 @@ export default {
 
 /* 新增的容器包裹整个report-generator */
 .report-container-wrapper {
-  width: 98%; /* 比外部框稍窄一点 */
+  width: 100%; /* 比外部框稍窄一点 */
   max-width: 1800px; /* 最大宽度限制 */
   margin: 0 auto; /* 居中显示 */
 }
@@ -619,8 +621,12 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 响应式调整 */
