@@ -1,9 +1,6 @@
 <template>
   <div class="header-section">
     <div class="header-content">
-      <div class="title-container">
-        <h1>报告模板管理</h1>
-      </div>
       <h1>{{ taskName }}</h1>
       <p class="id">{{ taskID }}</p>
     </div>
