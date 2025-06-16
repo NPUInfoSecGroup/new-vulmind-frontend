@@ -51,10 +51,10 @@ const task = ref({
   /* padding: 20px; */
   height: 100%;
   gap: 10px;
-  background-color: #0e1c32b5;
-  border: #0d1f2d 1px solid;
+  /* background-color: #0e1c32b5; */
+  /* border: #0d1f2d 1px solid; */
   border-radius: 1rem;
-  padding: 20px;
+  /* padding: 20px; */
 }
 :deep(.el-container) {
   gap: 20px;

@@ -1,6 +1,6 @@
 <template>
   <div class="scanner-box">
-    <el-scrollbar ref="scrollbarRef">
+    <el-scrollbar>
       <div class="message">
         <div v-for="(msg, index) in messages" :key="index">
           <p>
@@ -77,10 +77,17 @@ async function sendMessage() {
 
 <style scoped>
 .scanner-box {
-  height: 100%;
+  height: 57.8vh;
   display: flex;
   flex-direction: column;
   width: 100%;
+  background-color: #0f172a;
+  border-radius: 1rem;
+  margin-top: 15px;
+  margin-bottom: 0;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  color: #cbd5e0;
+  padding: 10px;
 }
 
 .el-scrollbar {

@@ -4,15 +4,9 @@
     <div class="header-section">
       <div class="header-content">
         <div class="title-container">
-          <i class="fas fa-history"></i>
           <h1>扫描历史记录</h1>
         </div>
         <p class="subtitle">查看和管理扫描历史记录，分析漏洞技术细节</p>
-      </div>
-      <div class="header-decoration">
-        <div class="decoration-item"></div>
-        <div class="decoration-item"></div>
-        <div class="decoration-item"></div>
       </div>
     </div>
 
@@ -227,7 +221,7 @@
           </div>
 
           <div class="card-footer action-buttons">
-            <el-button type="primary" @click="viewTechnicalDetails(row)">
+            <el-button type="primary" @click="viewTechnicalDetails(row)" class="gobutton">
               <i class="fas fa-search"></i> 查看详情
             </el-button>
           </div>
@@ -1250,7 +1244,7 @@ h1 {
 .vuln-item {
   /* height: 100%; */
   font-size: 0.8rem !important;
-  margin: 10px 0;
+  margin: 5px 0 10px;
   background: rgba(30, 41, 59, 0.6);
   border-radius: 1rem;
   overflow: hidden;
@@ -1261,5 +1255,8 @@ h1 {
 .vuln-count {
   font-size: 0.8rem;
   margin-left: 5px;
+}
+:deep(button.el-button.el-button--primary.gobutton) {
+  width: 100%;
 }
 </style>

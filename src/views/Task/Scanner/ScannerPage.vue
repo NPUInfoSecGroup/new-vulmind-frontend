@@ -1,6 +1,8 @@
 <template>
-  <TaskInfoView />
-  <EnvironmentInfoView></EnvironmentInfoView>
+  <div class="report-template-view">
+    <TaskInfoView />
+    <EnvironmentInfoView></EnvironmentInfoView>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -68,5 +70,14 @@ const activeName = ref('first')
 
 .header-title {
   padding: 20px;
+}
+.report-template-view {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  height: auto;
+  color: #e2e8f0;
 }
 </style>

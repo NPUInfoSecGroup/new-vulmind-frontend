@@ -4,15 +4,9 @@
     <div class="header-section">
       <div class="header-content">
         <div class="title-container">
-          <i class="fas fa-file-alt"></i>
           <h1>报告模板管理</h1>
         </div>
         <p class="subtitle">创建、编辑和管理您的安全扫描报告模板</p>
-      </div>
-      <div class="header-decoration">
-        <div class="decoration-item"></div>
-        <div class="decoration-item"></div>
-        <div class="decoration-item"></div>
       </div>
     </div>
 
