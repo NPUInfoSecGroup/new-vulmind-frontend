@@ -11,7 +11,7 @@
         <i class="fas fa-globe-americas" />
         <span>目标配置</span>
       </div>
-      <div class="form-group" v-if="targetType === 'url'">
+      <div class="form-group">
         <label class="form-label" for="url">任务名称</label>
         <input v-model="targetName" type="text" placeholder="扫描任务" class="form-input" />
       </div>
@@ -120,6 +120,7 @@ function startScan() {
   })
 
   console.log('开始扫描配置：', {
+    targetName: targetName.value,
     targetType: targetType.value,
     targetUrl: targetUrl.value,
     targetIP: targetIP.value,

@@ -145,7 +145,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-empty v-else description="暂无扫描记录" image-size="160" class="empty-placeholder" />
+    <el-empty v-else description="暂无扫描记录" :image-size="160" class="empty-placeholder" />
   </div>
 </template>
 

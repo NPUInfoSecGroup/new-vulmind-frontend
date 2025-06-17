@@ -11,45 +11,11 @@
 </template>
 
 <script lang="ts" setup>
-// import { useRoute } from 'vue-router'
-// import { useChatStore } from '@/stores/chat'
-// import { useTaskStore } from '@/stores/task'
-// import { computed, onMounted, watch, ref, nextTick } from 'vue'
 import MarkdownIt from 'markdown-it'
 import { useConfigStore } from '@/stores/config'
 
 const configStore = useConfigStore()
 const baseUrl = configStore.getServerUrl
-
-// const route = useRoute()
-// const taskID = route.params.taskID as string
-// const chatStore = useChatStore()
-// const taskStore = useTaskStore()
-
-// const scrollbarRef = ref<InstanceType<(typeof import('element-plus'))['ElScrollbar']> | null>(null)
-
-// const messages = computed(() => chatStore.getMessages(taskID))
-// const task = computed(() => taskStore.getById(taskID))
-
-// onMounted(async () => {
-//   await chatStore.fetchAllConversations()
-
-//   if (chatStore.getMessages(taskID).length === 0) {
-//     const defaultMsg = {
-//       role: 'user' as 'user',
-//       content: task.value.command,
-//       timestamp: new Date().toISOString(),
-//     }
-
-//     // await chatStore.sendMessage(taskID, defaultMsg)
-
-//     await chatStore.streamReceive(taskID, (msg) => {
-//       console.log('assistant 回复:', msg.content)
-//     })
-//   }
-// })
-
-// 监听 messages 变化，自动滚动到底部
 
 const md = new MarkdownIt()
 
@@ -57,10 +23,8 @@ const renderContent = (content: string) => {
   return md.render(content)
 }
 
-/////////////////////////////\
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import axios from 'axios'
-import { c } from 'vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf'
 
 const config = reactive({
   target: '',

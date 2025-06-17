@@ -70,12 +70,21 @@ export const useTaskStore = defineStore('task', {
      */
     async addTask(task: Omit<Task, 'id' | 'results' | 'startTime'>) {
       try {
+        const configStore = useConfigStore()
+        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+
         console.log('Adding task:', task)
-        const response = await fetch(`${this.API_BASE}/tasks`, {
+        const response = await fetch(`${API_BASE}/tasks`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...task, results: [] }),
         })
+
+        if (!response.ok) {
+          const text = await response.text()
+          throw new Error(`Add task failed: ${response.status} - ${text}`)
+        }
+
         const newTask: Task = await response.json()
         this.tasks.push(newTask)
       } catch (error) {
@@ -91,11 +100,20 @@ export const useTaskStore = defineStore('task', {
      */
     async updateTask(id: string, updates: Partial<Task>) {
       try {
-        const response = await fetch(`${this.API_BASE}/tasks/${id}`, {
+        const configStore = useConfigStore()
+        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+
+        const response = await fetch(`${API_BASE}/tasks/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updates),
         })
+
+        if (!response.ok) {
+          const text = await response.text()
+          throw new Error(`Update task failed: ${response.status} - ${text}`)
+        }
+
         const updated: Task = await response.json()
         const idx = this.tasks.findIndex((t) => t.id === id)
         if (idx !== -1) this.tasks.splice(idx, 1, updated)
@@ -103,7 +121,6 @@ export const useTaskStore = defineStore('task', {
         console.error('updateTask error:', error)
       }
     },
-
     /**
      * 删除任务
      * 后端接口：DELETE /tasks/{id}
@@ -111,13 +128,23 @@ export const useTaskStore = defineStore('task', {
      */
     async removeTask(id: string) {
       try {
-        await fetch(`${this.API_BASE}/tasks/${id}`, { method: 'DELETE' })
+        const configStore = useConfigStore()
+        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+
+        const response = await fetch(`${API_BASE}/tasks/${id}`, {
+          method: 'DELETE',
+        })
+
+        if (!response.ok) {
+          const text = await response.text()
+          throw new Error(`Delete task failed: ${response.status} - ${text}`)
+        }
+
         this.tasks = this.tasks.filter((t) => t.id !== id)
       } catch (error) {
         console.error('removeTask error:', error)
       }
     },
-
     /**
      * 本地新增扫描结果
      * 若后端提供实时推送，可改为接收 WebSocket 或 SSE 更新
@@ -136,13 +163,17 @@ export const useTaskStore = defineStore('task', {
      */
     async startTask(id: string) {
       try {
-        const response = await fetch(`${this.API_BASE}/tasks/${id}/start`, {
+        const configStore = useConfigStore()
+        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+
+        const response = await fetch(`${API_BASE}/tasks/${id}/start`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         })
 
         if (!response.ok) {
-          throw new Error(`Failed to start task: ${response.status}`)
+          const text = await response.text()
+          throw new Error(`Start task failed: ${response.status} - ${text}`)
         }
 
         const updated: Task = await response.json()
@@ -150,7 +181,6 @@ export const useTaskStore = defineStore('task', {
         if (idx !== -1) this.tasks.splice(idx, 1, updated)
       } catch (error) {
         console.error('startTask error:', error)
-        // 可选：将错误传递给调用者或显示错误提示
         throw error
       }
     },
