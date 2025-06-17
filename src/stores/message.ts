@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+// 后端基础地址
+const API_BASE = 'http://localhost:3000' //前端测试
 /** 对话消息 */
 export interface Message {
   role: 'user' | 'assistant' | 'system'
@@ -28,7 +30,7 @@ export const useChatStore = defineStore('chat', {
     async sendMessage(taskId: string, message: Message) {
       // POST /api/tasks/{taskId}/messages -> Message
       try {
-        const res = await fetch(`/api/tasks/${taskId}/messages`, {
+        const res = await fetch(`${API_BASE}/api/tasks/${taskId}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(message),
@@ -46,7 +48,7 @@ export const useChatStore = defineStore('chat', {
      */
     async streamReceive(taskId: string, onMessage: (msg: Message) => void) {
       // 触发流式接口
-      const response = await fetch(`/api/tasks/${taskId}/stream`, {
+      const response = await fetch(`${API_BASE}/tasks/${taskId}/stream`, {
         method: 'GET',
         headers: { Accept: 'text/plain' },
       })
@@ -72,7 +74,21 @@ export const useChatStore = defineStore('chat', {
         }
       }
     },
-
+    async fetchAllConversations() {
+      try {
+        const res = await fetch(`${API_BASE}/conversations`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`)
+        }
+        const data: Conversation[] = await res.json()
+        this.convs = data
+      } catch (e) {
+        console.error('拉取所有对话记录失败:', e)
+      }
+    },
     /** 内部方法：追加消息到 state */
     _appendMsg(taskId: string, msg: Message) {
       let conv = this.convs.find((c) => c.taskId === taskId)

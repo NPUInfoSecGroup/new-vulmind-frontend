@@ -123,5 +123,27 @@ export const useTaskStore = defineStore('task', {
         task.results.push(result)
       }
     },
+    /**
+     * 获取最近的任务列表
+     * 这里假设最近任务是指最近 5 个任务
+     */
+    getRecentTasks(number): Task[] {
+      console.log(number)
+      if (number === undefined || number <= 0) {
+        console.log('未指定数量，使用默认值 5')
+        number = 5 // 默认返回最近 5 个任务
+      }
+      if (this.tasks.length < number) {
+        console.log(`任务少于 ${number} 个，返回全部任务`)
+        number = this.tasks.length // 如果任务少于 5 个，则返回所有任务
+      }
+      // 按 startTime 降序排序，返回最近的任务
+      console.log(this.tasks.slice(number).reverse())
+      return this.tasks.slice(-number).reverse() // 返回最近 5 个任务，按时间倒序
+      // 这里可以根据实际需求调整返回数量或排序方式
+    },
+    getScanHistory() {
+      return this.tasks
+    },
   },
 })

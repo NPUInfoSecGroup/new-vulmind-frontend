@@ -22,10 +22,10 @@
         <div class="report-preview-container">
           <h3>近期任务</h3>
           <div class="recent-tasks">
-            <div class="task-card" v-for="n in 1" :key="n">
-              <h4>任务 #{{ n }}</h4>
-              <p>状态：已完成</p>
-              <p>时间：2025-06-16</p>
+            <div class="task-card" v-for="item in recentTask" :key="item.id">
+              <h4>任务 #{{ item.name }}</h4>
+              <p>状态：{{ item.status }}</p>
+              <p>目标：{{ item.target }}</p>
             </div>
           </div>
         </div>
@@ -47,15 +47,25 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import TaskAddPage from '@/views/Home/Task/ScanTarget.vue'
+import { useTaskStore } from '@/stores/task'
 
+const taskStore = useTaskStore()
+const emit = defineEmits(['success', 'cancel'])
 const showAddDialog = ref(false)
-
+const recentTask = ref([])
+const fetchTasks = async () => {
+  await taskStore.fetchTasks()
+  recentTask.value = taskStore.getRecentTasks(1)
+}
+fetchTasks()
 const open = () => {
   showAddDialog.value = true
+  fetchTasks() // 刷新最近任务
 }
 
 const handleScanCancel = () => {
   showAddDialog.value = false
+  fetchTasks() // 刷新最近任务
 }
 </script>
 

@@ -5,10 +5,8 @@
         <h2>环境信息</h2>
         <div class="message-card">
           <div class="header-title">
-            <p>{{ task.target }}</p>
-            <el-tag effect="light" type="info" round>
-              {{ task.type }}
-            </el-tag>
+            <span class="target">{{ task.target }}</span>
+            <span class="command">{{ task.command }}</span>
           </div>
           <div class="action">
             <el-button type="primary" @click=""> 执行任务 </el-button>
@@ -19,7 +17,7 @@
             <!-- <el-card>
               <div class="terminal-content"></div>
             </el-card> -->
-            <ScanStatus />
+            <!-- <ScanStatus /> -->
           </div>
         </el-scrollbar>
       </el-aside>
@@ -32,16 +30,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { useTaskStore } from '@/stores/task'
 import MessageView from './Message/MessageView.vue'
 import ScanStatus from '@/views/Home/ScanStatus.vue'
-const task = ref({
-  name: '任务1',
-  type: 'interactive',
-  status: 'completed',
-  target: 'http://example.com',
-  created_at: '2023-10-01 12:00:00',
-})
+const route = useRoute()
+const taskID = route.params.taskID as string
+const taskStore = useTaskStore()
+const task = taskStore.getById(taskID)
 </script>
 
 <style scoped>
@@ -99,5 +95,19 @@ h2 {
   padding: 10px;
   color: #ffffff;
   font-weight: bold;
+}
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.target {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.command {
+  font-size: 1rem;
+  color: #9ca3af;
 }
 </style>

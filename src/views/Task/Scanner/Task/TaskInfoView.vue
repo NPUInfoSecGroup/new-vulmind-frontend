@@ -1,7 +1,7 @@
 <template>
   <div class="header-section">
     <div class="header-content">
-      <h1>{{ taskName }}</h1>
+      <h1 v-if="isTaskReady">{{ task.name }}</h1>
       <p class="id">{{ taskID }}</p>
     </div>
 
@@ -13,10 +13,42 @@
 
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { useTaskStore } from '@/stores/task'
+import { computed, watch, ref } from 'vue'
+
+const taskStore = useTaskStore()
 const route = useRoute()
 const taskID = route.params.taskID as string
-const taskName = ref('1123')
+
+const task = computed(() => taskStore.getById(taskID))
+
+// 控制是否已加载到目标任务
+const isTaskReady = ref(false)
+
+async function loadTasks() {
+  await taskStore.fetchTasks()
+}
+
+loadTasks()
+
+watch(
+  task,
+  (newTask) => {
+    if (newTask) {
+      console.log('当前任务信息:', newTask)
+      isTaskReady.value = true
+      doSomethingAfterTask()
+    } else {
+      // 还没找到对应任务，isTaskReady 置 false，防止误用
+      isTaskReady.value = false
+    }
+  },
+  { immediate: true },
+)
+
+function doSomethingAfterTask() {
+  console.log('执行后续逻辑')
+}
 </script>
 
 <style scoped>

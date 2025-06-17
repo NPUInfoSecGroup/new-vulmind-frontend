@@ -52,16 +52,16 @@
             <label class="filter-label">状态</label>
             <el-select v-model="filterForm.status" placeholder="选择状态" class="filter-select">
               <el-option label="全部" value="" />
-              <el-option label="已完成" value="completed" />
+              <el-option label="挂起" value="pending" />
+              <el-option label="执行" value="running" />
+              <el-option label="完成" value="completed" />
               <el-option label="失败" value="failed" />
-              <el-option label="进行中" value="scanning" />
             </el-select>
           </div>
         </el-col>
       </el-row>
     </div>
-
-    <el-row :gutter="20" class="scan-history-cards" v-if="filteredHistory.length > 0" s>
+    <el-row :gutter="20" class="scan-history-cards" v-if="filteredHistory.length > 0">
       <el-col
         v-for="(row, index) in filteredHistory"
         :key="index"
@@ -76,15 +76,27 @@
             <div class="name">
               {{ row.name || `扫描记录 ${index + 1}` }}
               <el-tag
-                :type="row.type === 'web' ? 'primary' : 'warning'"
+                :type="/^(?:\d{1,3}\.){3}\d{1,3}$/.test(row.target) ? 'warning' : 'primary'"
                 class="scan-type-tag"
-                effect="Plain"
+                effect="plain"
               >
-                {{ row.type === 'web' ? 'Web扫描' : '二进制扫描' }}
+                {{ /^(?:\d{1,3}\.){3}\d{1,3}$/.test(row.target) ? 'IP扫描' : 'Web扫描' }}
               </el-tag>
             </div>
             <div class="date-info">
-              <div class="date">{{ row.date }} {{ row.time }}</div>
+              <div class="date">{{ row.startTime }}</div>
+              <div class="info-item pending" v-if="row.status == 'pending'">
+                <p>挂起</p>
+              </div>
+              <div class="info-item running" v-if="row.status == 'running'">
+                <p>执行</p>
+              </div>
+              <div class="info-item completed" v-if="row.status == 'completed'">
+                <p>完成</p>
+              </div>
+              <div class="info-item failed" v-if="row.status == 'failed'">
+                <p>失败</p>
+              </div>
             </div>
           </div>
 
@@ -95,21 +107,32 @@
             </div>
 
             <div class="vuln-summary">
-              <div class="vuln-item critical" v-if="row.vulnSummary.critical > 0">
+              <div class="vuln-item critical" v-if="vulnSummary(row).critical > 0">
                 <span class="vuln-label">严重</span>
-                <span class="vuln-count">{{ row.vulnSummary.critical }}</span>
+                <span class="vuln-count">{{ vulnSummary(row).critical }}</span>
               </div>
-              <div class="vuln-item high" v-if="row.vulnSummary.high > 0">
+              <div class="vuln-item high" v-if="vulnSummary(row).high > 0">
                 <span class="vuln-label">高危</span>
-                <span class="vuln-count">{{ row.vulnSummary.high }}</span>
+                <span class="vuln-count">{{ vulnSummary(row).high }}</span>
               </div>
-              <div class="vuln-item medium" v-if="row.vulnSummary.medium > 0">
+              <div class="vuln-item medium" v-if="vulnSummary(row).medium > 0">
                 <span class="vuln-label">中危</span>
-                <span class="vuln-count">{{ row.vulnSummary.medium }}</span>
+                <span class="vuln-count">{{ vulnSummary(row).medium }}</span>
               </div>
-              <div class="vuln-item low" v-if="row.vulnSummary.low > 0">
+              <div class="vuln-item low" v-if="vulnSummary(row).low > 0">
                 <span class="vuln-label">低危</span>
-                <span class="vuln-count">{{ row.vulnSummary.low }}</span>
+                <span class="vuln-count">{{ vulnSummary(row).low }}</span>
+              </div>
+              <div
+                class="vuln-item safe"
+                v-if="
+                  vulnSummary(row).low === 0 &&
+                  vulnSummary(row).medium === 0 &&
+                  vulnSummary(row).high === 0 &&
+                  vulnSummary(row).critical === 0
+                "
+              >
+                <span class="vuln-label">无风险</span>
               </div>
             </div>
           </div>
@@ -123,110 +146,16 @@
       </el-col>
     </el-row>
     <el-empty v-else description="暂无扫描记录" image-size="160" class="empty-placeholder" />
-
-    <el-dialog
-      v-model="detailDialogVisible"
-      :title="`扫描技术细节 - ${currentScan ? currentScan.target : ''}`"
-      width="85%"
-      top="5vh"
-      custom-class="tech-detail-dialog"
-    >
-      <div class="tech-detail-container" v-if="currentScan">
-        <!-- 扫描元数据部分保持不变 -->
-
-        <!-- 漏洞列表部分 -->
-        <div class="vulnerability-section">
-          <h3 class="section-title">
-            <i class="fas fa-bug"></i> 漏洞列表
-            <span class="vuln-count">(共 {{ currentScan.vulnerabilities.length }} 个漏洞)</span>
-          </h3>
-
-          <div class="vuln-list">
-            <!-- 每个漏洞项 -->
-            <div
-              v-for="vuln in currentScan.vulnerabilities"
-              :key="vuln.id"
-              class="vuln-item"
-              :class="vuln.severity"
-            >
-              <!-- 漏洞头部信息 -->
-              <div class="vuln-header">
-                <div class="vuln-title">
-                  <span class="vuln-id">{{ vuln.id }}</span>
-                  <span class="vuln-name">{{ vuln.name }}</span>
-                  <el-tag
-                    :type="getSeverityTagType(vuln.severity)"
-                    size="small"
-                    effect="dark"
-                    class="severity-tag"
-                  >
-                    {{ getSeverityLabel(vuln.severity) }}
-                  </el-tag>
-                </div>
-                <div class="vuln-actions">
-                  <!-- 验证漏洞按钮 -->
-                  <!-- 导出详情按钮 -->
-                  <el-tooltip effect="dark" content="导出详情" placement="top">
-                    <el-button circle size="small" @click="exportVulnerability(vuln)">
-                      <i class="fas fa-download"></i>
-                    </el-button>
-                  </el-tooltip>
-                </div>
-              </div>
-
-              <!-- 漏洞内容 -->
-              <div class="vuln-content">
-                <!-- 漏洞描述 -->
-                <div class="vuln-description">
-                  <label>详细描述:</label>
-                  <p>{{ vuln.description }}</p>
-                </div>
-
-                <!-- 漏洞信息网格 -->
-                <div class="vuln-info-grid">
-                  <div class="info-item">
-                    <label>风险等级:</label>
-                    <span :class="'risk-level ' + vuln.severity">
-                      {{ getSeverityLevel(vuln.severity) }}
-                    </span>
-                  </div>
-                  <div class="info-item">
-                    <label>发现时间:</label>
-                    <span>{{ currentScan.time }}</span>
-                  </div>
-                </div>
-
-                <!-- 添加漏洞位置信息 -->
-                <div class="vuln-location" v-if="vuln.location">
-                  <label>漏洞位置:</label>
-                  <pre>{{ vuln.location }}</pre>
-                </div>
-
-                <!-- 添加请求/响应信息 -->
-                <div class="vuln-request" v-if="vuln.request">
-                  <label>请求示例:</label>
-                  <pre>{{ vuln.request }}</pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="detailDialogVisible = false">关闭</el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useTaskStore } from '@/stores/task'
 
+const taskStore = useTaskStore() // 引入任务存储
 const router = useRouter() // ✅ 获取路由实例
 // 历史记录数据
 const scanHistory = ref([])
@@ -235,30 +164,31 @@ const scanHistory = ref([])
 const loading = ref(true)
 
 // 加载扫描历史数据
+
+const fetchTasks = async () => {
+  await taskStore.fetchTasks()
+}
 const loadScanHistory = async () => {
+  loading.value = true
   try {
-    loading.value = true
+    await fetchTasks()
+    scanHistory.value = taskStore.getScanHistory()
 
-    const modules = import.meta.glob('/src/scan-details/scan-*.json')
-
-    const scanFiles = await Promise.all(
-      Object.keys(modules).map(async (path) => {
-        const module = await modules[path]()
-        return module.default || module
-      }),
-    )
-
-    scanHistory.value = scanFiles.filter(Boolean).sort((a, b) => b.id.localeCompare(a.id))
-  } catch (e) {
-    console.error('加载扫描记录失败:', e)
-    ElMessage.error('加载扫描记录失败: ' + e.message)
+    if (scanHistory.value.length === 0) {
+      ElMessage.info('暂无扫描历史记录')
+    } else {
+      console.log('获取的扫描历史数量:', scanHistory.value.length)
+    }
+  } catch (error) {
+    ElMessage.error('加载扫描历史失败，请稍后重试')
+    console.error('加载扫描历史失败:', error)
   } finally {
     loading.value = false
   }
 }
 
 onMounted(() => {
-  loadScanHistory()
+  loadScanHistory() // 不再在外面判断长度
 })
 
 // 过滤表单
@@ -268,129 +198,39 @@ const filterForm = reactive({
   status: '',
 })
 
-// // 分页设置
-// const currentPage = ref(1)
-// const pageSize = ref(5)
-// const totalItems = computed(() => scanHistory.value.length)
-
-// 过滤后的历史记录
 const filteredHistory = computed(() => {
-  return scanHistory.value.filter((record) => {
+  const history = scanHistory.value ?? []
+  const dateRange = filterForm.dateRange ?? []
+
+  return history.filter((record) => {
     const matchesTarget = filterForm.target
       ? record.target.toLowerCase().includes(filterForm.target.toLowerCase())
       : true
 
     const matchesDate =
-      filterForm.dateRange.length === 2
-        ? record.date >= filterForm.dateRange[0] && record.date <= filterForm.dateRange[1]
+      dateRange.length === 2
+        ? new Date(record.startTime) >= new Date(dateRange[0]) &&
+          new Date(record.startTime) <= new Date(dateRange[1])
         : true
 
     const matchesStatus = filterForm.status ? record.status === filterForm.status : true
 
     return matchesTarget && matchesDate && matchesStatus
   })
-  // .slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
 })
 
-// 搜索历史
-const searchHistory = () => {
-  currentPage.value = 1
-}
-
-// 重置筛选条件
-const resetFilter = () => {
-  filterForm.target = ''
-  filterForm.dateRange = []
-  filterForm.status = ''
-  currentPage.value = 1
-}
-
-// 分页切换
-const handlePageChange = (page) => {
-  currentPage.value = page
-}
-
-// 技术细节弹窗控制
-const detailDialogVisible = ref(false)
-const currentScan = ref(null)
-
-// 获取严重性标签颜色
-const getSeverityTagType = (severity) => {
-  switch (severity) {
-    case 'critical':
-      return 'danger'
-    case 'high':
-      return 'warning'
-    case 'medium':
-      return 'primary'
-    case 'low':
-      return 'success'
-    default:
-      return 'info'
-  }
-}
-
-// 获取严重性中文标签
-const getSeverityLabel = (severity) => {
-  switch (severity) {
-    case 'critical':
-      return '严重'
-    case 'high':
-      return '高危'
-    case 'medium':
-      return '中危'
-    case 'low':
-      return '低危'
-    default:
-      return '未知'
-  }
-}
-
-// 获取风险等级描述
-const getSeverityLevel = (severity) => {
-  switch (severity) {
-    case 'critical':
-      return '极高风险'
-    case 'high':
-      return '高风险'
-    case 'medium':
-      return '中等风险'
-    case 'low':
-      return '低风险'
-    default:
-      return '未知风险'
+const vulnSummary = (row) => {
+  return {
+    critical: row.results.filter((vuln) => vuln.severity === 'critical').length,
+    high: row.results.filter((vuln) => vuln.severity === 'high').length,
+    medium: row.results.filter((vuln) => vuln.severity === 'medium').length,
+    low: row.results.filter((vuln) => vuln.severity === 'low').length,
   }
 }
 
 // 查看技术细节
 const viewTechnicalDetails = (row) => {
-  currentScan.value = { ...row }
   router.push('/scan-history/' + row.id)
-}
-
-// 生成报告
-const generateReport = (row) => {
-  ElMessage.success(`正在生成 ${row.target} 的扫描报告...`)
-  // TODO: 实际生成逻辑
-}
-
-// 行点击处理
-const handleRowClick = (row) => {
-  console.log('点击行:', row.id)
-}
-
-// 导出单条漏洞记录为 JSON
-const exportVulnerability = (vuln) => {
-  const blob = new Blob([JSON.stringify(vuln, null, 2)], {
-    type: 'application/json',
-  })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${vuln.id}.json`
-  a.click()
-  URL.revokeObjectURL(url)
-  ElMessage.success(`${vuln.id} 已导出`)
 }
 </script>
 
@@ -653,6 +493,8 @@ label.filter-label {
 .scan-type-tag {
   font-weight: 600;
   letter-spacing: 0.5px;
+  padding: 1rem 0.8rem;
+  /* border: 2px solid transparent; */
 }
 
 .vuln-item {
@@ -680,6 +522,10 @@ label.filter-label {
 }
 
 .vuln-item.low {
+  background: rgba(120, 130, 127, 0.15);
+  color: #a2afaa;
+}
+.vuln-item.safe {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
 }
@@ -869,22 +715,6 @@ label.filter-label {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
-}
-
-.vuln-item.critical {
-  border-left-color: #ef4444;
-}
-
-.vuln-item.high {
-  border-left-color: #f59e0b;
-}
-
-.vuln-item.medium {
-  border-left-color: #3b82f6;
-}
-
-.vuln-item.low {
-  border-left-color: #10b981;
 }
 
 .vuln-header {
@@ -1103,7 +933,7 @@ label.filter-label {
   color: #cbd5e0;
 }
 .date-info {
-  font-size: 0.8rem;
+  font-size: 1rem;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -1119,6 +949,7 @@ label.filter-label {
   justify-content: space-between;
   align-items: center;
   font-size: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 .target-info {
   background-color: #081322;
@@ -1129,9 +960,6 @@ label.filter-label {
   padding: 0.5rem;
   border-radius: 0.5rem;
 }
-.scan-history-card {
-  height: 15rem;
-}
 .vuln-summary {
   display: flex;
   flex-wrap: nowrap;
@@ -1139,11 +967,11 @@ label.filter-label {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  margin: 1rem 0;
 }
 .vuln-item {
   /* height: 100%; */
   font-size: 0.8rem !important;
-  margin: 5px 0 10px;
   background: rgba(30, 41, 59, 0.6);
   border-radius: 1rem;
   overflow: hidden;
@@ -1157,5 +985,27 @@ label.filter-label {
 }
 :deep(button.el-button.el-button--primary.gobutton) {
   width: 100%;
+}
+.info-item {
+  padding: 0.25rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
+.info-item.pending {
+  background: rgba(183, 183, 183, 0.15);
+  color: #cccccc;
+}
+.info-item.running {
+  background: rgba(68, 239, 97, 0.15);
+  color: #71f8ac;
+}
+.info-item.completed {
+  background: rgba(68, 114, 239, 0.15);
+  color: #71b9f8;
+}
+.info-item.failed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }
 </style>

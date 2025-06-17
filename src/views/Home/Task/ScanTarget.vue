@@ -37,9 +37,9 @@
         <label class="form-label" for="ipRange">目标 IP：</label>
         <input
           id="ipRange"
-          v-model="ipRange"
+          v-model="targetIP"
           type="text"
-          placeholder="192.168.1.1-192.168.1.255"
+          placeholder="192.168.1.1"
           class="form-input"
         />
       </div>
@@ -55,8 +55,8 @@
       <div class="form-group">
         <textarea
           id="suggestions"
-          v-model="suggestions"
-          placeholder="请输入特定的扫描要求或建议..."
+          v-model="command"
+          placeholder="请输入特定的扫描要求"
           class="form-textarea"
         ></textarea>
       </div>
@@ -64,74 +64,66 @@
 
     <!-- 操作按钮 -->
     <div class="actions">
-      <el-button type="" class="no" size="large" @click="resetForm"> 取消 </el-button>
+      <el-button type="" class="no" size="large" @click="cancel"> 取消 </el-button>
       <el-button type="primary" class="yes" size="large" @click="startScan"> 启动扫描 </el-button>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ScanTarget',
-  data() {
-    return {
-      targetType: 'url', // 默认目标类型为 URL
-      targetUrl: '',
-      ipRange: '',
-      availableTools: [
-        'fenjing',
-        'fscan',
-        'dirsearch',
-        'curl',
-        'githack',
-        'ds_store_exp',
-        'gotoscan',
-        'SQLMap',
-        'xss',
-      ],
-      selectedTools: [],
-      suggestions: '',
-    }
-  },
-  methods: {
-    startScan() {
-      // 表单验证逻辑
-      if (!this.targetUrl && !this.ipRange) {
-        alert('请至少输入一个目标URL或IP范围')
-        return
-      }
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useTaskStore } from '@/stores/task'
+const emit = defineEmits(['success', 'cancel'])
+const taskStore = useTaskStore()
 
-      if (this.selectedTools.length === 0) {
-        alert('请至少选择一个扫描工具')
-        return
-      }
+let targetType = ref('url') // 默认目标类型为 URL
+let targetUrl = ref('')
+let targetIP = ref('')
+let command = ref('')
 
-      console.log('开始扫描配置：', {
-        targetUrl: this.targetUrl,
-        ipRange: this.ipRange,
-        tools: this.selectedTools,
-        suggestions: this.suggestions,
-      })
+function startScan() {
+  // 表单验证逻辑
+  if (!targetUrl.value && !targetIP.value) {
+    alert('请至输入任务目标')
+    return
+  }
+  // 目标类型验证
+  if (targetType.value === 'url' && !/^https?:\/\/[^\s]+$/.test(targetUrl.value)) {
+    alert('请输入有效的 URL')
+    return
+  }
+  if (
+    targetType.value === 'ip' &&
+    !/^\d{1,3}(\.\d{1,3}){3}(-\d{1,3}(\.\d{1,3}){3})?$/.test(targetIP.value)
+  ) {
+    alert('请输入有效的 IP 地址范围')
+    return
+  }
+  if (!command.value) {
+    alert('请至少输入一个扫描要求')
+    return
+  }
 
-      // 实际扫描逻辑
-      alert(`扫描已启动！使用工具：${this.selectedTools.join(', ')}`)
+  // 添加新任务到任务列表
+  taskStore.addTask({
+    name: `扫描任务 - ${targetType.value === 'url' ? targetUrl.value : targetIP.value}`,
+    target: targetType.value === 'url' ? targetUrl.value : targetIP.value,
+    command: command.value,
+    status: 'pending',
+  })
 
-      // TODO: 调用API启动扫描
-      // this.$store.dispatch('startScan', {
-      //   targetUrl: this.targetUrl,
-      //   ipRange: this.ipRange,
-      //   tools: this.selectedTools,
-      //   suggestions: this.suggestions
-      // });
-    },
-    resetForm() {
-      this.$router.push('/')
-      this.$emit('cancel')
-    },
-  },
+  console.log('开始扫描配置：', {
+    targetType: targetType.value,
+    targetUrl: targetUrl.value,
+    targetIP: targetIP.value,
+    command: command.value,
+  })
+  emit('success') // 触发父组件关闭弹窗
+}
+function cancel() {
+  emit('cancel')
 }
 </script>
-
 <style scoped>
 .scan-target {
   width: 100%;
