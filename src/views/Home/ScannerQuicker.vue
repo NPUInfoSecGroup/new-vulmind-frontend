@@ -4,7 +4,7 @@
       <!-- 头部 -->
       <div class="report-header">
         <i class="fas fa-file-alt" />
-        <h2>报告生成</h2>
+        <h2>扫描任务</h2>
       </div>
 
       <div class="report-body">
@@ -22,11 +22,51 @@
         <div class="report-preview-container">
           <h3>近期任务</h3>
           <div class="recent-tasks">
-            <div class="task-card" v-for="item in recentTask" :key="item.id">
-              <h4>任务 #{{ item.name }}</h4>
+            <!-- <h4>任务 #{{ item.name }}</h4>
               <p>状态：{{ item.status }}</p>
-              <p>目标：{{ item.target }}</p>
-            </div>
+              <p>目标：{{ item.target }}</p> -->
+
+            <el-card
+              class="scan-history-card"
+              shadow="hover"
+              v-for="item in recentTask"
+              :key="item.id"
+            >
+              <div class="scanner-header">
+                <div class="name">
+                  {{ item.name }}
+                  <el-tag
+                    :type="/^(?:\d{1,3}\.){3}\d{1,3}$/.test(item.target) ? 'warning' : 'primary'"
+                    class="scan-type-tag"
+                    effect="plain"
+                  >
+                    {{ /^(?:\d{1,3}\.){3}\d{1,3}$/.test(item.target) ? 'IP扫描' : 'Web扫描' }}
+                  </el-tag>
+                </div>
+                <div class="date-info">
+                  <div class="date">{{ item.startTime }}</div>
+                  <div class="info-item pending" v-if="item.status == 'pending'">
+                    <p>挂起</p>
+                  </div>
+                  <div class="info-item running" v-if="item.status == 'running'">
+                    <p>执行</p>
+                  </div>
+                  <div class="info-item completed" v-if="item.status == 'completed'">
+                    <p>完成</p>
+                  </div>
+                  <div class="info-item failed" v-if="item.status == 'failed'">
+                    <p>失败</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div class="target-info">
+                  <i class="fas" :class="item.type === 'web' ? 'fa-globe' : 'fa-file-code'"></i>
+                  <span class="target">{{ item.target }}</span>
+                </div>
+              </div>
+            </el-card>
           </div>
         </div>
       </div>
@@ -133,7 +173,6 @@ const handleScanCancel = () => {
 /* 整体容器 - 宽度调整为100% */
 .report-generator {
   width: 100%; /* 拉伸到整个宽度 */
-  background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
   color: var(--text-primary);
   border-radius: 16px;
   overflow: hidden;
@@ -164,7 +203,7 @@ const handleScanCancel = () => {
 .report-body {
   padding: 1.5rem;
   display: flex;
-  flex-direction: row;
+  flex-direction: item;
   justify-content: space-around;
   align-items: stretch; /* 关键：让子项高度自动拉伸为相同 */
   gap: 20px;
@@ -226,7 +265,7 @@ const handleScanCancel = () => {
   border: 1px solid rgba(100, 116, 139, 0.2);
 }
 
-.select-row {
+.select-item {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -463,7 +502,7 @@ const handleScanCancel = () => {
     width: 100%;
   }
 
-  .select-row {
+  .select-item {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -488,5 +527,91 @@ const handleScanCancel = () => {
 }
 :deep(.el-dialog__headerbtn) {
   display: none;
+}
+.scan-history-card {
+  background-color: #0f172a;
+  border-radius: 1rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  color: #cbd5e0;
+}
+.date-info {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  color: #404853;
+}
+.scan-type-tag {
+  border-radius: 0.5rem;
+}
+.name {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+.target-info {
+  background-color: #081322;
+  box-shadow: var(--box-shadow);
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+.vuln-summary {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 1rem 0;
+}
+.vuln-item {
+  /* height: 100%; */
+  font-size: 0.8rem !important;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.vuln-count {
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+:deep(button.el-button.el-button--primary.gobutton) {
+  width: 100%;
+}
+.info-item {
+  padding: 0.25rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
+.info-item.pending {
+  background: rgba(183, 183, 183, 0.15);
+  color: #cccccc;
+  margin-left: 0;
+}
+.info-item.running {
+  background: rgba(68, 239, 97, 0.15);
+  color: #71f8ac;
+}
+.info-item.completed {
+  background: rgba(68, 114, 239, 0.15);
+  color: #71b9f8;
+}
+.info-item.failed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }
 </style>

@@ -324,3 +324,14 @@
 .xterm .xterm-scrollable-element>.shadow.top.left {
     box-shadow: var(--vscode-scrollbar-shadow, #000) 6px 0 6px -6px inset;
 }
+
+.xterm .xterm-viewport {
+    background-color: rgb(25 32 52) !important;
+}
+
+.xterm .xterm-rows>div {
+    line-height: 1.4 !important;
+    /* 控制上下间距 */
+    letter-spacing: 0.05em !important;
+    /* 控制左右字符间距 */
+}

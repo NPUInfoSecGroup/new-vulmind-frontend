@@ -75,6 +75,7 @@ const api_key = ref('')
   font-size: 18px;
   font-weight: bold;
   /* margin-left: 10px; */
+  margin-left: 1.5rem;
   margin-bottom: 10px;
   border-bottom: none;
   color: aliceblue;

@@ -14,14 +14,9 @@
             </el-button>
           </div>
         </div>
-        <el-scrollbar>
-          <div class="terminal">
-            <!-- <el-card>
-              <div class="terminal-content"></div>
-            </el-card> -->
-            <!-- <ScanStatus /> -->
-          </div>
-        </el-scrollbar>
+        <div class="terminal">
+          <Terminal />
+        </div>
       </el-aside>
       <el-main>
         <h2>扫描过程</h2>
@@ -35,7 +30,7 @@
 import { useRoute } from 'vue-router'
 import { useTaskStore } from '@/stores/task'
 import MessageView from './Message/MessageView.vue'
-import ScanStatus from '@/views/Task/Scanner/Environment/ScanStatus.vue'
+import Terminal from './terminal.vue'
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 
 const route = useRoute()
@@ -130,6 +125,7 @@ watch(
   display: flex;
   flex-direction: column;
   height: 65vh;
+  overflow: hidden;
 }
 .message-card {
   background-color: #2a41524f;
@@ -179,5 +175,9 @@ h2 {
 .command {
   font-size: 1rem;
   color: #9ca3af;
+}
+.terminal {
+  border-radius: 1rem;
+  box-shadow: var(--box-shadow);
 }
 </style>
