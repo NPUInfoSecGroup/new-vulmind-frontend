@@ -40,11 +40,11 @@ function writeLine(line: { type: string; content: string }) {
       break
 
     case 'instruction':
-      term.writeln('[指令] ' + line.content)
+      term.writeln('$ ' + line.content)
       break
 
     case 'structure':
-      term.writeln('[结构] ⇩')
+      term.writeln('> ')
       try {
         // 尝试解析并美化 JSON
         const obj = JSON.parse(line.content)
