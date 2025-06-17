@@ -1,0 +1,26 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "name": "示例任务",
+      "target": "http://example.com",
+      "command": "scan",
+      "status": "completed",
+      "startTime": "2025-06-17T08:00:00Z",
+      "results": [
+        {
+          "resultId": "r1",
+          "severity": "high",
+          "vulnType": "SQL Injection",
+          "details": "详情……"
+        }
+      ]
+    }
+  ],
+  "messages": {
+    "1": [
+      { "role": "user", "content": "你好", "timestamp": "2025-06-17T08:01:00Z" },
+      { "role": "assistant", "content": "Hi！", "timestamp": "2025-06-17T08:01:01Z" }
+    ]
+  }
+}
