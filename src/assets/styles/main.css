@@ -1,3 +1,15 @@
+/* JetBrains Mono */
+@import url('https://fonts.loli.net/css?family=JetBrains Mono:400,500,600,700&display=swap');
+/* Noto Sans SC */
+@import url('https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@100..900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap'); */
+/* 思源宋体 */
+@import url('https://fonts.googleapis.com/css2?family=Noto Serif SC&display=swap');
+/* Roboto Slab */
+@import url('https://fonts.googleapis.com/css2?family=Roboto Slab&display=swap');
+/* Roboto*/
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 :root {
     --primary: #4361ee;
     --secondary: #3f37c9;
@@ -32,11 +44,27 @@
     --transition: all 0.3s ease;
 }
 
+
+
+:root {
+    --md-text-font: 'Noto Sans SC';
+    --md-code-font: "JetBrains Mono", 'Noto Sans SC', 'Source Han Sans';
+}
+
+body {
+    font-family: var(--md-text-font);
+}
+
+code,
+pre {
+    font-family: var(--md-code-font);
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    /* font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; */
 }
 
 body {

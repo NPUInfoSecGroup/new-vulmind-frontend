@@ -220,11 +220,13 @@ const filteredHistory = computed(() => {
 })
 
 const vulnSummary = (row) => {
+  const results = row?.results || []
+
   return {
-    critical: row.results.filter((vuln) => vuln.severity === 'critical').length,
-    high: row.results.filter((vuln) => vuln.severity === 'high').length,
-    medium: row.results.filter((vuln) => vuln.severity === 'medium').length,
-    low: row.results.filter((vuln) => vuln.severity === 'low').length,
+    critical: results.filter((vuln) => vuln.severity === 'critical').length,
+    high: results.filter((vuln) => vuln.severity === 'high').length,
+    medium: results.filter((vuln) => vuln.severity === 'medium').length,
+    low: results.filter((vuln) => vuln.severity === 'low').length,
   }
 }
 

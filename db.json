@@ -35,11 +35,6 @@
       "results": []
     },
     {
-      "status": "running",
-      "startTime": "2025-06-17T05:31:55.452Z",
-      "id": "d4ac0291-b84d-4e12-a27a-2135d17c5e62"
-    },
-    {
       "id": "ee739942-a142-4b55-bdd7-2a61702b4299",
       "name": "任务 - 多漏洞",
       "target": "http://vulnsite.com",
@@ -66,6 +61,22 @@
           "details": "服务器返回了详细版本号信息。"
         }
       ]
+    },
+    {
+      "id": "d906",
+      "name": "213123",
+      "target": "https://1111.111",
+      "command": "12213213",
+      "status": "completed",
+      "results": []
+    },
+    {
+      "id": "8032",
+      "name": "342523",
+      "target": "https://1.11",
+      "command": "111",
+      "status": "completed",
+      "results": []
     }
   ],
   "conversations": [
@@ -74,7 +85,7 @@
       "messages": [
         {
           "role": "user",
-          "content": "请开始扫描 http://example.com",
+          "content": "# 请开始扫描 http://example.com",
           "timestamp": "2025-06-17T08:00:01Z"
         },
         {
@@ -139,7 +150,7 @@
       "messages": [
         {
           "role": "user",
-          "content": "执行全扫描并报告所有结果。",
+          "content": "执行全扫描*并*报**告所**有结果。",
           "timestamp": "2025-06-15T08:59:00Z"
         },
         {
@@ -149,7 +160,7 @@
         },
         {
           "role": "system",
-          "content": "任务状态更新为 completed",
+          "content": "任务状态更新为 `completed`",
           "timestamp": "2025-06-15T09:05:45Z"
         },
         {

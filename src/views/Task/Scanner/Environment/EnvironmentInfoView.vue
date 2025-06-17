@@ -9,7 +9,7 @@
             <span class="command">{{ task.command }}</span>
           </div>
           <div class="action">
-            <el-button type="primary" @click=""> 执行任务 </el-button>
+            <el-button type="primary" @click="start"> 执行任务 </el-button>
           </div>
         </div>
         <el-scrollbar>
@@ -33,11 +33,79 @@
 import { useRoute } from 'vue-router'
 import { useTaskStore } from '@/stores/task'
 import MessageView from './Message/MessageView.vue'
-import ScanStatus from '@/views/Home/ScanStatus.vue'
+import ScanStatus from '@/views/Task/Scanner/Environment/ScanStatus.vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+
 const route = useRoute()
 const taskID = route.params.taskID as string
 const taskStore = useTaskStore()
-const task = taskStore.getById(taskID)
+const task = ref(taskStore.getById(taskID))
+
+// 定时器和轮询状态标志
+const statusPollingInterval = ref<NodeJS.Timeout | null>(null)
+const isPolling = ref(false)
+
+// 启动状态轮询
+const startStatusPolling = () => {
+  // 避免重复轮询或不必要的轮询
+  if (isPolling.value || task.value?.status === 'completed' || task.value?.status === 'failed') {
+    return
+  }
+
+  isPolling.value = true
+
+  statusPollingInterval.value = setInterval(async () => {
+    try {
+      await taskStore.fetchTasks()
+      task.value = taskStore.getById(taskID)
+
+      if (task.value?.status === 'completed' || task.value?.status === 'failed') {
+        console.log(`任务 ${taskID} 已结束，状态: ${task.value.status}`)
+        stopStatusPolling()
+      }
+    } catch (error) {
+      console.error('轮询任务状态失败:', error)
+      stopStatusPolling()
+    }
+  }, 5000)
+}
+
+// 停止状态轮询
+const stopStatusPolling = () => {
+  if (statusPollingInterval.value) {
+    clearInterval(statusPollingInterval.value)
+    statusPollingInterval.value = null
+  }
+  isPolling.value = false
+}
+
+// 启动任务
+function start() {
+  taskStore.startTask(taskID)
+  startStatusPolling()
+}
+
+// 组件挂载时开始轮询
+onMounted(() => {
+  startStatusPolling()
+})
+
+// 组件卸载前停止轮询
+onBeforeUnmount(() => {
+  stopStatusPolling()
+})
+
+// 监听任务状态变化
+watch(
+  () => taskStore.getById(taskID),
+  (newTask) => {
+    task.value = newTask
+    if (newTask?.status === 'completed' || newTask?.status === 'failed') {
+      stopStatusPolling()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

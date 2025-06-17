@@ -3,15 +3,14 @@
     <el-scrollbar ref="scrollbarRef" class="chat-panel">
       <div class="message">
         <div v-for="(msg, i) in messages" :key="i">
-          <p>
+          <!-- <p>
             <strong
               >{{
                 msg.role === 'user' ? '👤 你' : msg.role === 'assistant' ? '🤖 AI' : '📢 系统'
               }}：</strong
             >
-          </p>
-          <p>{{ msg.content }}</p>
-          <hr />
+          </p> -->
+          <div v-html="renderContent(msg.content)" class="markdown-content"></div>
         </div>
       </div>
     </el-scrollbar>
@@ -20,9 +19,10 @@
 
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
-import { useChatStore } from '@/stores/message'
+import { useChatStore } from '@/stores/chat'
 import { useTaskStore } from '@/stores/task'
 import { computed, onMounted } from 'vue'
+import MarkdownIt from 'markdown-it'
 
 const route = useRoute()
 const taskID = route.params.taskID as string
@@ -52,6 +52,13 @@ onMounted(async () => {
     })
   }
 })
+
+const md = new MarkdownIt()
+
+// 将每条消息的 content 渲染为 HTML
+const renderContent = (content: string) => {
+  return md.render(content)
+}
 </script>
 
 <style scoped>

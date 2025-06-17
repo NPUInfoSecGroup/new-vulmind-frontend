@@ -124,6 +124,32 @@ export const useTaskStore = defineStore('task', {
       }
     },
     /**
+     * 启动任务
+     * 后端接口：POST /tasks/{id}/start
+     * 请求体：空
+     * 返回示例：更新后的 Task 对象（状态变为 running）
+     */
+    async startTask(id: string) {
+      try {
+        const response = await fetch(`${API_BASE}/tasks/${id}/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to start task: ${response.status}`)
+        }
+
+        const updated: Task = await response.json()
+        const idx = this.tasks.findIndex((t) => t.id === id)
+        if (idx !== -1) this.tasks.splice(idx, 1, updated)
+      } catch (error) {
+        console.error('startTask error:', error)
+        // 可选：将错误传递给调用者或显示错误提示
+        throw error
+      }
+    },
+    /**
      * 获取最近的任务列表
      * 这里假设最近任务是指最近 5 个任务
      */
