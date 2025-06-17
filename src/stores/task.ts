@@ -1,7 +1,8 @@
 import { timePickerDefaultProps } from 'element-plus'
 import { defineStore } from 'pinia'
+import { useConfigStore } from './config'
 // 后端基础地址
-const API_BASE = 'http://127.0.0.1:9000' //前端测试
+// const API_BASE = 'http://127.0.0.1:9000' //前端测试
 // ====== 数据接口定义 ======
 // ScanResult 表示一次扫描的结果，由后端返回
 export interface ScanResult {
@@ -50,6 +51,9 @@ export const useTaskStore = defineStore('task', {
     async fetchTasks() {
       try {
         console.log('Fetching tasks from backend...')
+        const configStore = useConfigStore()
+        var API_BASE = configStore.getServerUrl ? configStore.getServerUrl : 'http://127.0.0.1:8000' // 获取服务器地址
+        console.log('API_BASE:', API_BASE)
         const response = await fetch(`${API_BASE}/tasks`)
         const data = await response.json()
         this.tasks = data.tasks // 这里改成 data.tasks
@@ -67,7 +71,7 @@ export const useTaskStore = defineStore('task', {
     async addTask(task: Omit<Task, 'id' | 'results' | 'startTime'>) {
       try {
         console.log('Adding task:', task)
-        const response = await fetch(`${API_BASE}/tasks`, {
+        const response = await fetch(`${this.API_BASE}/tasks`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...task, results: [] }),
@@ -87,7 +91,7 @@ export const useTaskStore = defineStore('task', {
      */
     async updateTask(id: string, updates: Partial<Task>) {
       try {
-        const response = await fetch(`${API_BASE}/tasks/${id}`, {
+        const response = await fetch(`${this.API_BASE}/tasks/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updates),
@@ -107,7 +111,7 @@ export const useTaskStore = defineStore('task', {
      */
     async removeTask(id: string) {
       try {
-        await fetch(`${API_BASE}/tasks/${id}`, { method: 'DELETE' })
+        await fetch(`${this.API_BASE}/tasks/${id}`, { method: 'DELETE' })
         this.tasks = this.tasks.filter((t) => t.id !== id)
       } catch (error) {
         console.error('removeTask error:', error)
@@ -132,7 +136,7 @@ export const useTaskStore = defineStore('task', {
      */
     async startTask(id: string) {
       try {
-        const response = await fetch(`${API_BASE}/tasks/${id}/start`, {
+        const response = await fetch(`${this.API_BASE}/tasks/${id}/start`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         })

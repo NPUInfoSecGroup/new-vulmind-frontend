@@ -31,7 +31,11 @@
               </el-collapse-item>
               <el-collapse-item title="服务器配置" name="2">
                 <p>服务器地址</p>
-                <el-input v-model="serve_url" placeholder="请输入base_url" size="large"></el-input>
+                <el-input
+                  v-model="serve_url"
+                  placeholder="请输入服务器地址"
+                  size="large"
+                ></el-input>
               </el-collapse-item>
             </el-collapse>
           </div>
@@ -46,7 +50,6 @@
 </template>
 
 <script lang="ts" setup>
-import ConfigSubView from './ConfigSubView.vue'
 import { useConfigStore } from '@/stores/config'
 import { ref } from 'vue'
 
@@ -54,7 +57,6 @@ const configStore = useConfigStore()
 import type { CollapseIconPositionType } from 'element-plus'
 
 const position = ref<CollapseIconPositionType>('left')
-const value = ref('')
 const options = ref([
   { value: 'openai', label: 'OpenAI' },
   { value: 'anthropic', label: 'Anthropic' },
@@ -63,9 +65,10 @@ const options = ref([
   { value: 'baidu', label: 'Baidu' },
 ])
 
-const base_url = ref('')
-const serve_url = ref('')
-const api_key = ref('')
+const value = ref(configStore.getLLMConfig.modelProvider)
+const base_url = ref(configStore.getLLMConfig.APIBaseUrl)
+const serve_url = ref(configStore.getServerUrl)
+const api_key = ref(configStore.getLLMConfig.APIKey)
 function saveConfig() {
   configStore.updateLLMConfig({
     modelProvider: value.value,
