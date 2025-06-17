@@ -30,7 +30,7 @@
 import { useRoute } from 'vue-router'
 import { useTaskStore } from '@/stores/task'
 import MessageView from './Message/MessageView.vue'
-import Terminal from './terminal.vue'
+import Terminal from './TerminalView.vue'
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 
 const route = useRoute()

@@ -54,7 +54,7 @@ const routes = [
     path: '/terminal',
     name: 'terminal',
     meta: { title: app + ' - 调试' }, // 此处加自定义字段
-    component: () => import('@/views/Task/Scanner/Environment/terminal.vue'), // 显示扫描页内容
+    component: () => import('@/views/Task/Scanner/Environment/TerminalView.vue'), // 显示扫描页内容
   },
   {
     path: '/test01',
