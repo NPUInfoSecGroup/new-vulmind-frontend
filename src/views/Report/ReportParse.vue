@@ -3,7 +3,7 @@
     <!-- 顶部标题栏 -->
     <header class="app-header">
       <div class="header-content">
-        <h1 class="app-title">报告生成系统</h1>
+        <h1 class="app-title">VulMind报告生成系统</h1>
       </div>
     </header>
 
