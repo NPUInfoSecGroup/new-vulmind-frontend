@@ -330,8 +330,11 @@
 }
 
 .xterm .xterm-rows>div {
-    line-height: 1.4 !important;
-    /* 控制上下间距 */
     letter-spacing: 0.05em !important;
-    /* 控制左右字符间距 */
+    font-family: var(--md-code-font);
+    margin: .5rem 1rem;
+}
+
+.xterm-dom-renderer-owner-2 .xterm-rows {
+    margin: 1rem;
 }
