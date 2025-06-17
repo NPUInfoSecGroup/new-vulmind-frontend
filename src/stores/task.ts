@@ -1,6 +1,7 @@
+import { timePickerDefaultProps } from 'element-plus'
 import { defineStore } from 'pinia'
 // 后端基础地址
-const API_BASE = 'http://localhost:3000' //前端测试
+const API_BASE = 'http://127.0.0.1:9000' //前端测试
 // ====== 数据接口定义 ======
 // ScanResult 表示一次扫描的结果，由后端返回
 export interface ScanResult {
@@ -50,8 +51,8 @@ export const useTaskStore = defineStore('task', {
       try {
         console.log('Fetching tasks from backend...')
         const response = await fetch(`${API_BASE}/tasks`)
-        const data: Task[] = await response.json()
-        this.tasks = data
+        const data = await response.json()
+        this.tasks = data.tasks // 这里改成 data.tasks
       } catch (error) {
         console.error('fetchTasks error:', error)
       }

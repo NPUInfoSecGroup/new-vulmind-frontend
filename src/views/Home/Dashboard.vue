@@ -1,29 +1,23 @@
 <template>
-  <div class="dashboard-container">
-    <!-- 顶部标题栏 -->
-    <header class="app-header">
-      <div class="header-content">
-        <h1 class="app-title">VulMind</h1>
-        <p class="app-subtitle">可拓展大模型漏洞扫描平台</p>
-      </div>
-    </header>
-
-    <!-- 主内容区 - 填满宽度 -->
-    <div class="main-content">
-      <!-- 漏洞概览组件 -->
-      <VulnerabilityOverview
-        :scan-count="8"
-        :critical="9"
-        :high="7"
-        :medium="13"
-        :low="11"
-      />
-
-      <!-- 其他组件 -->
-      <ScannerQuicker />
-      <ReportGenerator />
+  <!-- <div class="dashboard-container"> -->
+  <!-- 顶部标题栏 -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">VulMind</h1>
+      <p class="app-subtitle">可拓展大模型漏洞扫描平台</p>
     </div>
+  </header>
+
+  <!-- 主内容区 - 填满宽度 -->
+  <div class="main-content">
+    <!-- 漏洞概览组件 -->
+    <VulnerabilityOverview :scan-count="8" :critical="9" :high="7" :medium="13" :low="11" />
+
+    <!-- 其他组件 -->
+    <ScannerQuicker />
+    <ReportGenerator />
   </div>
+  <!-- </div> -->
 </template>
 
 <script setup>
@@ -93,8 +87,8 @@ import VulnerabilityOverview from './VulnerabilityOverview.vue'
   flex-direction: column;
   gap: 25px;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  /* max-width: 1200px; */
+  /* margin: 0 auto; */
   position: relative;
   z-index: 2;
 }
@@ -134,7 +128,7 @@ import VulnerabilityOverview from './VulnerabilityOverview.vue'
   }
 
   .app-subtitle {
-    font-size: 1.0rem;
+    font-size: 1rem;
   }
 }
 </style>

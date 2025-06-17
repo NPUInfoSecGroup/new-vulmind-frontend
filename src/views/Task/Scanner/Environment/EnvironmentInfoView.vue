@@ -9,7 +9,9 @@
             <span class="command">{{ task.command }}</span>
           </div>
           <div class="action">
-            <el-button type="primary" @click="start"> 执行任务 </el-button>
+            <el-button type="primary" @click="start" v-if="task.status == 'pending'">
+              执行任务
+            </el-button>
           </div>
         </div>
         <el-scrollbar>

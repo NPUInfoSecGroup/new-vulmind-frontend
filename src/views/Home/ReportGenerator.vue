@@ -133,228 +133,205 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted, reactive, computed } from 'vue'
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 
-export default {
-  name: 'ReportGenerator',
-  setup() {
-    // 扫描历史记录
-    const scanHistory = ref([])
+// 扫描历史记录
+const scanHistory = ref([])
 
-    // 报告模板
-    const reportTemplates = ref([])
-    const loadingTemplates = ref(true)
-    const templateLoadError = ref(false)
+// 报告模板
+const reportTemplates = ref([])
+const loadingTemplates = ref(true)
+const templateLoadError = ref(false)
 
-    // 当前选中的模板ID
-    const selectedReportTemplateId = ref(null)
+// 当前选中的扫描记录ID
+const selectedRecordId = ref(null)
 
-    // 当前选中的扫描记录
-    const currentScan = reactive({
-      id: '',
-      date: '',
-      time: '',
-      target: '',
-      type: '',
-      status: '',
-      vulnSummary: {},
-      vulnerabilities: [],
-    })
+// 当前选中的模板ID
+const selectedReportTemplateId = ref(null)
 
-    // 当前选中的模板
-    const selectedTemplate = computed(() => {
-      return reportTemplates.value.find(t => t.id === selectedReportTemplateId.value) || null
-    })
+// 当前选中的扫描记录
+const currentScan = reactive({
+  id: '',
+  date: '',
+  time: '',
+  target: '',
+  type: '',
+  status: '',
+  vulnSummary: {},
+  vulnerabilities: [],
+  duration: '',
+})
 
-    // 加载状态
-    const loading = ref(true)
+// 当前选中的模板
+const selectedTemplate = computed(() => {
+  return reportTemplates.value.find((t) => t.id === selectedReportTemplateId.value) || null
+})
 
-    // 表单数据
-    const reporterName = ref('系统管理员')
-    const currentDate = ref(
-      new Date().toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-    )
+// 加载状态
+const loading = ref(true)
 
-    // 严重漏洞列表
-    const criticalVulns = computed(() => {
-      return currentScan.vulnerabilities?.filter((v) => v.severity === 'critical') || []
-    })
+// 表单数据
+const reporterName = ref('系统管理员')
+const currentDate = ref(
+  new Date().toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }),
+)
 
-    // 扫描持续时间的文本表示
-    const scanDurationText = computed(() => {
-      const duration = parseInt(currentScan.duration)
-      if (isNaN(duration)) return '0秒'
+// 严重漏洞列表
+const criticalVulns = computed(() => {
+  return currentScan.vulnerabilities?.filter((v) => v.severity === 'critical') || []
+})
 
-      if (duration < 60) {
-        return `${duration}秒`
-      } else {
-        const minutes = Math.floor(duration / 60)
-        const seconds = duration % 60
-        return `${minutes}分${seconds}秒`
-      }
-    })
+// 扫描持续时间的文本表示
+const scanDurationText = computed(() => {
+  const duration = parseInt(currentScan.duration)
+  if (isNaN(duration)) return '0秒'
 
-    // 扫描状态文本
-    const scanStatusText = computed(() => {
-      switch (currentScan.status) {
-        case 'completed':
-          return '已完成'
-        case 'failed':
-          return '失败'
-        case 'scanning':
-          return '进行中'
-        default:
-          return currentScan.status || '未知状态'
-      }
-    })
+  if (duration < 60) {
+    return `${duration}秒`
+  } else {
+    const minutes = Math.floor(duration / 60)
+    const seconds = duration % 60
+    return `${minutes}分${seconds}秒`
+  }
+})
 
-    // 扫描类型标签
-    const scanTypeLabel = (type) => {
-      switch (type) {
-        case 'web':
-          return 'Web扫描'
-        case 'binary':
-          return '二进制扫描'
-        default:
-          return type || '未知类型'
-      }
-    }
+// 扫描状态文本
+const scanStatusText = computed(() => {
+  switch (currentScan.status) {
+    case 'completed':
+      return '已完成'
+    case 'failed':
+      return '失败'
+    case 'scanning':
+      return '进行中'
+    default:
+      return currentScan.status || '未知状态'
+  }
+})
 
-    // 加载扫描历史数据
-    const loadScanHistory = async () => {
-      try {
-        loading.value = true
-
-        // 使用 Vite 的 glob 导入功能
-        const modules = import.meta.glob('/src/scan-details/scan-*.json', { eager: true })
-
-        // 提取扫描文件
-        scanHistory.value = Object.values(modules)
-          .map((module) => module.default)
-          .filter(Boolean)
-          .sort((a, b) => b.id.localeCompare(a.id))
-
-        // 默认选择第一条记录
-        if (scanHistory.value.length > 0) {
-          selectedRecordId.value = scanHistory.value[0].id
-          handleScanSelection()
-        }
-      } catch (e) {
-        console.error('加载扫描记录失败:', e)
-        ElMessage.error('加载扫描记录失败: ' + e.message)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    // 动态加载报告模板
-    const loadReportTemplates = async () => {
-      try {
-        loadingTemplates.value = true;
-
-        // 使用 Vite 的 glob 导入功能从 scan-template 目录加载模板
-        const modules = import.meta.glob('/src/scan-template/*.json', { eager: true });
-
-        // 提取模板数据
-        const templates = Object.values(modules)
-          .map(module => module.default)
-          .filter(Boolean);
-
-        // 按创建日期排序，最新的在前
-        templates.sort((a, b) => new Date(b.created) - new Date(a.created));
-
-        reportTemplates.value = templates;
-
-        // 设置默认选中：找到第一个标记为默认的或第一个模板
-        const defaultTemplate = templates.find(t => t.isDefault) || templates[0];
-        if (defaultTemplate) {
-          selectedReportTemplateId.value = defaultTemplate.id;
-        }
-
-        templateLoadError.value = false;
-      } catch (e) {
-        console.error('加载报告模板失败:', e);
-        ElMessage.error('加载报告模板失败: ' + e.message);
-        templateLoadError.value = true;
-      } finally {
-        loadingTemplates.value = false;
-      }
-    }
-
-    // 处理扫描记录选择
-    const handleScanSelection = () => {
-      if (!selectedRecordId.value) return
-
-      const record = scanHistory.value.find((r) => r.id === selectedRecordId.value)
-      if (!record) {
-        ElMessage.error('扫描记录不存在')
-        return
-      }
-
-      // 更新当前扫描记录数据
-      Object.assign(currentScan, record)
-    }
-
-    // 组件挂载时加载数据
-    onMounted(() => {
-      loadScanHistory();
-      loadReportTemplates();
-    })
-
-    // 报告生成方法
-    const generateReport = () => {
-      if (!selectedRecordId.value) {
-        ElMessage.warning('请选择扫描记录')
-        return
-      }
-
-      if (!selectedReportTemplateId.value) {
-        ElMessage.warning('请选择报告模板')
-        return
-      }
-
-      if (!selectedTemplate.value) {
-        ElMessage.error('所选模板不存在')
-        return
-      }
-
-      ElMessage.success(`"${selectedTemplate.value.name}"报告生成完成`)
-    }
-
-    // 其他操作方法
-    const saveReport = () => ElMessage.success('报告已保存')
-    const exportReport = () => ElMessage.success('报告已导出')
-    const shareReport = () => ElMessage.success('报告已分享')
-
-    return {
-      scanHistory,
-      reportTemplates,
-      loadingTemplates,
-      templateLoadError,
-      currentScan,
-      selectedReportTemplateId,
-      selectedTemplate,
-      reporterName,
-      currentDate,
-      loading,
-      criticalVulns,
-      scanDurationText,
-      scanStatusText,
-      scanTypeLabel,
-      handleScanSelection,
-      generateReport,
-      saveReport,
-      exportReport,
-      shareReport,
-    }
-  },
+// 扫描类型标签
+const scanTypeLabel = (type) => {
+  switch (type) {
+    case 'web':
+      return 'Web扫描'
+    case 'binary':
+      return '二进制扫描'
+    default:
+      return type || '未知类型'
+  }
 }
+
+// 加载扫描历史数据
+const loadScanHistory = async () => {
+  try {
+    loading.value = true
+
+    // 使用 Vite 的 glob 导入功能
+    const modules = import.meta.glob('/src/scan-details/scan-*.json', { eager: true })
+
+    // 提取扫描文件
+    scanHistory.value = Object.values(modules)
+      .map((module) => module.default)
+      .filter(Boolean)
+      .sort((a, b) => b.id.localeCompare(a.id))
+
+    // 默认选择第一条记录
+    if (scanHistory.value.length > 0) {
+      selectedRecordId.value = scanHistory.value[0].id
+      handleScanSelection()
+    }
+  } catch (e) {
+    console.error('加载扫描记录失败:', e)
+    ElMessage.error('加载扫描记录失败: ' + e.message)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 动态加载报告模板
+const loadReportTemplates = async () => {
+  try {
+    loadingTemplates.value = true
+
+    // 使用 Vite 的 glob 导入功能从 scan-template 目录加载模板
+    const modules = import.meta.glob('/src/scan-template/*.json', { eager: true })
+
+    // 提取模板数据
+    const templates = Object.values(modules)
+      .map((module) => module.default)
+      .filter(Boolean)
+
+    // 按创建日期排序，最新的在前
+    templates.sort((a, b) => new Date(b.created) - new Date(a.created))
+
+    reportTemplates.value = templates
+
+    // 设置默认选中：找到第一个标记为默认的或第一个模板
+    const defaultTemplate = templates.find((t) => t.isDefault) || templates[0]
+    if (defaultTemplate) {
+      selectedReportTemplateId.value = defaultTemplate.id
+    }
+
+    templateLoadError.value = false
+  } catch (e) {
+    console.error('加载报告模板失败:', e)
+    ElMessage.error('加载报告模板失败: ' + e.message)
+    templateLoadError.value = true
+  } finally {
+    loadingTemplates.value = false
+  }
+}
+
+// 处理扫描记录选择
+const handleScanSelection = () => {
+  if (!selectedRecordId.value) return
+
+  const record = scanHistory.value.find((r) => r.id === selectedRecordId.value)
+  if (!record) {
+    ElMessage.error('扫描记录不存在')
+    return
+  }
+
+  // 更新当前扫描记录数据
+  Object.assign(currentScan, record)
+}
+
+// 组件挂载时加载数据
+onMounted(() => {
+  loadScanHistory()
+  loadReportTemplates()
+})
+
+// 报告生成方法
+const generateReport = () => {
+  if (!selectedRecordId.value) {
+    ElMessage.warning('请选择扫描记录')
+    return
+  }
+
+  if (!selectedReportTemplateId.value) {
+    ElMessage.warning('请选择报告模板')
+    return
+  }
+
+  if (!selectedTemplate.value) {
+    ElMessage.error('所选模板不存在')
+    return
+  }
+
+  ElMessage.success(`"${selectedTemplate.value.name}"报告生成完成`)
+}
+
+// 其他操作方法
+const saveReport = () => ElMessage.success('报告已保存')
+const exportReport = () => ElMessage.success('报告已导出')
+const shareReport = () => ElMessage.success('报告已分享')
 </script>
 
 <style scoped>

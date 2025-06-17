@@ -35,12 +35,21 @@
       "results": []
     },
     {
+      "id": "d4ac0291-b84d-4e12-a27a-2135d17c5e62",
+      "name": "任务 - 未开始排队中",
+      "target": "https://secure.example.org",
+      "command": "scan --auth user:pass",
+      "status": "running",
+      "startTime": "2025-06-17T10:57:20.268019+00:00",
+      "results": []
+    },
+    {
       "id": "ee739942-a142-4b55-bdd7-2a61702b4299",
       "name": "任务 - 多漏洞",
       "target": "http://vulnsite.com",
       "command": "scan --full",
-      "status": "completed",
-      "startTime": "2025-06-15T09:00:00Z",
+      "status": "running",
+      "startTime": "2025-06-17T10:54:01.777119+00:00",
       "results": [
         {
           "resultId": "r-1",
@@ -59,114 +68,6 @@
           "severity": "low",
           "vulnType": "Server Banner Exposure",
           "details": "服务器返回了详细版本号信息。"
-        }
-      ]
-    },
-    {
-      "id": "d906",
-      "name": "213123",
-      "target": "https://1111.111",
-      "command": "12213213",
-      "status": "completed",
-      "results": []
-    },
-    {
-      "id": "8032",
-      "name": "342523",
-      "target": "https://1.11",
-      "command": "111",
-      "status": "completed",
-      "results": []
-    }
-  ],
-  "conversations": [
-    {
-      "taskId": "a1f4b9d3-8c1f-4c32-98a2-9f3e6f0c0e2b",
-      "messages": [
-        {
-          "role": "user",
-          "content": "# 请开始扫描 http://example.com",
-          "timestamp": "2025-06-17T08:00:01Z"
-        },
-        {
-          "role": "assistant",
-          "content": "已启动扫描任务，预计耗时约2分钟。",
-          "timestamp": "2025-06-17T08:00:02Z"
-        },
-        {
-          "role": "system",
-          "content": "任务状态更新为 running",
-          "timestamp": "2025-06-17T08:00:05Z"
-        },
-        {
-          "role": "system",
-          "content": "任务状态更新为 completed",
-          "timestamp": "2025-06-17T08:02:30Z"
-        }
-      ]
-    },
-    {
-      "taskId": "b7d1e234-9ac3-4ff6-b931-47c1c6cfbcd9",
-      "messages": [
-        {
-          "role": "user",
-          "content": "快速扫描 testsite.local",
-          "timestamp": "2025-06-17T10:30:00Z"
-        },
-        {
-          "role": "assistant",
-          "content": "收到指令，开始快速扫描。",
-          "timestamp": "2025-06-17T10:30:01Z"
-        },
-        {
-          "role": "system",
-          "content": "任务状态更新为 running",
-          "timestamp": "2025-06-17T10:30:05Z"
-        }
-      ]
-    },
-    {
-      "taskId": "c5e8887a-f845-4904-b6cd-7a1f1ff20d12",
-      "messages": [
-        {
-          "role": "user",
-          "content": "对 192.168.0.1 进行全面扫描。",
-          "timestamp": "2025-06-16T15:44:50Z"
-        },
-        {
-          "role": "assistant",
-          "content": "正在连接目标地址，请稍候。",
-          "timestamp": "2025-06-16T15:44:52Z"
-        },
-        {
-          "role": "system",
-          "content": "目标无法访问，任务失败。",
-          "timestamp": "2025-06-16T15:45:30Z"
-        }
-      ]
-    },
-    {
-      "taskId": "ee739942-a142-4b55-bdd7-2a61702b4299",
-      "messages": [
-        {
-          "role": "user",
-          "content": "执行全扫描*并*报**告所**有结果。",
-          "timestamp": "2025-06-15T08:59:00Z"
-        },
-        {
-          "role": "assistant",
-          "content": "全扫描开始，预计耗时较长。",
-          "timestamp": "2025-06-15T08:59:05Z"
-        },
-        {
-          "role": "system",
-          "content": "任务状态更新为 `completed`",
-          "timestamp": "2025-06-15T09:05:45Z"
-        },
-        {
-          "role": "assistant",
-          "content": "扫描完成，共发现 3 个漏洞。",
-          "timestamp": "2025-06-15T09:06:00Z"
         }
       ]
     }

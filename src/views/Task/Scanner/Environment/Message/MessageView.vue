@@ -43,7 +43,7 @@ onMounted(async () => {
       timestamp: new Date().toISOString(),
     }
 
-    await chatStore.sendMessage(taskID, defaultMsg)
+    // await chatStore.sendMessage(taskID, defaultMsg)
 
     // 发送成功后立即调用流式读取，逐字追加 assistant 回复
     await chatStore.streamReceive(taskID, (msg) => {
