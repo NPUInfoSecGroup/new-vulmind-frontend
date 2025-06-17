@@ -71,5 +71,237 @@
         }
       ]
     }
+  ],
+  "conversations": [
+    {
+      "taskId": "a1f4b9d3-8c1f-4c32-98a2-9f3e6f0c0e2b",
+      "messages": [
+        {
+          "role": "user",
+          "content": "请开始扫描 **http://example.com**",
+          "timestamp": "2025-06-17T08:00:01Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "> 已启动扫描任务，预计耗时约2分钟。",
+          "timestamp": "2025-06-17T08:00:02Z"
+        },
+        {
+          "role": "system",
+          "content": "任务状态更新为 running",
+          "timestamp": "2025-06-17T08:00:05Z"
+        },
+        {
+          "role": "system",
+          "content": "任务状态更新为 completed",
+          "timestamp": "2025-06-17T08:02:30Z"
+        }
+      ]
+    },
+    {
+      "taskId": "b7d1e234-9ac3-4ff6-b931-47c1c6cfbcd9",
+      "messages": [
+        {
+          "role": "user",
+          "content": "快速扫描 testsite.local",
+          "timestamp": "2025-06-17T10:30:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "收到指令，开始快速扫描。",
+          "timestamp": "2025-06-17T10:30:01Z"
+        },
+        {
+          "role": "system",
+          "content": "任务状态更新为 running",
+          "timestamp": "2025-06-17T10:30:05Z"
+        }
+      ]
+    },
+    {
+      "taskId": "c5e8887a-f845-4904-b6cd-7a1f1ff20d12",
+      "messages": [
+        {
+          "role": "user",
+          "content": "对 192.168.0.1 进行全面扫描。",
+          "timestamp": "2025-06-16T15:44:50Z"
+        },
+        {
+          "role": "assistant",
+          "content": "正在连接目标地址，请稍候。",
+          "timestamp": "2025-06-16T15:44:52Z"
+        },
+        {
+          "role": "system",
+          "content": "目标无法访问，任务失败。",
+          "timestamp": "2025-06-16T15:45:30Z"
+        }
+      ]
+    },
+    {
+      "taskId": "ee739942-a142-4b55-bdd7-2a61702b4299",
+      "messages": [
+        {
+          "role": "user",
+          "content": "执行全扫描并报告所有结果。",
+          "timestamp": "2025-06-15T08:59:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "全扫描开始，预计耗时较长。",
+          "timestamp": "2025-06-15T08:59:05Z"
+        },
+        {
+          "role": "system",
+          "content": "任务状态更新为 completed",
+          "timestamp": "2025-06-15T09:05:45Z"
+        },
+        {
+          "role": "assistant",
+          "content": "扫描完成，共发现 3 个漏洞。",
+          "timestamp": "2025-06-15T09:06:00Z"
+        }
+      ]
+    }
   ]
 }
