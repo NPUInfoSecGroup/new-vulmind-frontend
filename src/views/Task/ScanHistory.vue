@@ -172,7 +172,7 @@ const loadScanHistory = async () => {
   loading.value = true
   try {
     await fetchTasks()
-    scanHistory.value = taskStore.getScanHistory()
+    scanHistory.value = taskStore.getScanHistory().slice().reverse()
 
     if (scanHistory.value.length === 0) {
       ElMessage.info('暂无扫描历史记录')
@@ -995,6 +995,7 @@ label.filter-label {
 .info-item.pending {
   background: rgba(183, 183, 183, 0.15);
   color: #cccccc;
+  margin-left: 0;
 }
 .info-item.running {
   background: rgba(68, 239, 97, 0.15);

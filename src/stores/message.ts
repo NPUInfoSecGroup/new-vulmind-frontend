@@ -30,7 +30,7 @@ export const useChatStore = defineStore('chat', {
     async sendMessage(taskId: string, message: Message) {
       // POST /api/tasks/{taskId}/messages -> Message
       try {
-        const res = await fetch(`${API_BASE}/api/tasks/${taskId}/messages`, {
+        const res = await fetch(`${API_BASE}/${taskId}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(message),
@@ -48,7 +48,7 @@ export const useChatStore = defineStore('chat', {
      */
     async streamReceive(taskId: string, onMessage: (msg: Message) => void) {
       // 触发流式接口
-      const response = await fetch(`${API_BASE}/tasks/${taskId}/stream`, {
+      const response = await fetch(`${API_BASE}/${taskId}/stream`, {
         method: 'GET',
         headers: { Accept: 'text/plain' },
       })

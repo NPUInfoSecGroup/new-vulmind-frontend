@@ -11,6 +11,10 @@
         <i class="fas fa-globe-americas" />
         <span>目标配置</span>
       </div>
+      <div class="form-group" v-if="targetType === 'url'">
+        <label class="form-label" for="url">任务名称</label>
+        <input v-model="targetName" type="text" placeholder="扫描任务" class="form-input" />
+      </div>
       <!-- 新增：目标类型选择（Element Plus 实现） -->
       <div class="form-group">
         <label class="form-label" for="targetType">目标类型：</label>
@@ -73,12 +77,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useTaskStore } from '@/stores/task'
+import { useRouter } from 'vue-router'
 const emit = defineEmits(['success', 'cancel'])
 const taskStore = useTaskStore()
+const router = useRouter()
 
 let targetType = ref('url') // 默认目标类型为 URL
 let targetUrl = ref('')
 let targetIP = ref('')
+let targetName = ref('') // 新增：任务名称输入
 let command = ref('')
 
 function startScan() {
@@ -106,7 +113,7 @@ function startScan() {
 
   // 添加新任务到任务列表
   taskStore.addTask({
-    name: `扫描任务 - ${targetType.value === 'url' ? targetUrl.value : targetIP.value}`,
+    name: targetName.value || '扫描任务',
     target: targetType.value === 'url' ? targetUrl.value : targetIP.value,
     command: command.value,
     status: 'pending',
@@ -119,6 +126,7 @@ function startScan() {
     command: command.value,
   })
   emit('success') // 触发父组件关闭弹窗
+  router.push('/scan-history/')
 }
 function cancel() {
   emit('cancel')

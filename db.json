@@ -35,13 +35,9 @@
       "results": []
     },
     {
-      "id": "d4ac0291-b84d-4e12-a27a-2135d17c5e62",
-      "name": "任务 - 未开始排队中",
-      "target": "https://secure.example.org",
-      "command": "scan --auth user:pass",
-      "status": "pending",
-      "startTime": "2025-06-17T11:00:00Z",
-      "results": []
+      "status": "running",
+      "startTime": "2025-06-17T05:31:55.452Z",
+      "id": "d4ac0291-b84d-4e12-a27a-2135d17c5e62"
     },
     {
       "id": "ee739942-a142-4b55-bdd7-2a61702b4299",
