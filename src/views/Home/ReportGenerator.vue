@@ -10,7 +10,7 @@
       <div class="report-body">
         <!-- 操作按钮 -->
         <div class="report-actions">
-          <button class="action-button generate" @click="generateReport">
+          <button class="action-button generate" @click="goToReportParse">
             <i class="fas fa-sync-alt" />
             <span>生成报告</span>
           </button>
@@ -48,7 +48,7 @@
             <div class="select-label">扫描记录：</div>
             <select v-model="selectedRecordId" class="select-input" @change="handleScanSelection">
               <option v-for="rec in scanHistory" :key="rec.id" :value="rec.id">
-                {{ rec.date }} - {{ rec.id }} ({{ scanTypeLabel(rec.type) }})
+                {{ formatTaskDate(rec.startTime) }} - {{ rec.name || rec.id }} ({{ scanTypeLabel(rec.command) }})
               </option>
             </select>
           </div>
@@ -69,7 +69,7 @@
             </div>
             <div class="meta-item">
               <div class="meta-label">扫描类型</div>
-              <div class="meta-value">{{ scanTypeLabel(currentScan.type) }}</div>
+              <div class="meta-value">{{ scanTypeLabel(currentScan.command) }}</div>
             </div>
             <div class="meta-item">
               <div class="meta-label">生成者</div>
@@ -84,19 +84,19 @@
           <!-- 漏洞统计 -->
           <div class="vulnerability-stats">
             <div class="stat-card critical">
-              <div class="stat-value">{{ currentScan.vulnSummary?.critical || 0 }}</div>
+              <div class="stat-value">{{ vulnSummary.critical || 0 }}</div>
               <div class="stat-label">严重漏洞</div>
             </div>
             <div class="stat-card high">
-              <div class="stat-value">{{ currentScan.vulnSummary?.high || 0 }}</div>
+              <div class="stat-value">{{ vulnSummary.high || 0 }}</div>
               <div class="stat-label">高危漏洞</div>
             </div>
             <div class="stat-card medium">
-              <div class="stat-value">{{ currentScan.vulnSummary?.medium || 0 }}</div>
+              <div class="stat-value">{{ vulnSummary.medium || 0 }}</div>
               <div class="stat-label">中危漏洞</div>
             </div>
             <div class="stat-card low">
-              <div class="stat-value">{{ currentScan.vulnSummary?.low || 0 }}</div>
+              <div class="stat-value">{{ vulnSummary.low || 0 }}</div>
               <div class="stat-label">低危漏洞</div>
             </div>
           </div>
@@ -110,18 +110,18 @@
             </div>
             <div class="summary-item">
               <div class="summary-label">扫描时间:</div>
-              <div class="summary-value">{{ scanDurationText }}</div>
+              <div class="summary-value">{{ formatTaskDate(currentScan.startTime) }}</div>
             </div>
             <div class="summary-item">
               <div class="summary-label">扫描状态:</div>
-              <div class="summary-value">{{ scanStatusText }}</div>
+              <div class="summary-value">{{ statusLabel(currentScan.status) }}</div>
             </div>
             <div v-if="criticalVulns.length > 0" class="summary-item">
               <div class="summary-label">严重漏洞详情:</div>
               <div class="summary-value">
                 <ul class="critical-vuln-list">
                   <li v-for="(vuln, index) in criticalVulns" :key="index">
-                    {{ vuln.name }}
+                    {{ vuln.vulnType }}
                   </li>
                 </ul>
               </div>
@@ -136,6 +136,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import router from '@/router/index.js'
 
 // 扫描历史记录
 const scanHistory = ref([])
@@ -154,14 +155,33 @@ const selectedReportTemplateId = ref(null)
 // 当前选中的扫描记录
 const currentScan = reactive({
   id: '',
-  date: '',
-  time: '',
+  name: '',
   target: '',
-  type: '',
+  command: '',
   status: '',
-  vulnSummary: {},
-  vulnerabilities: [],
-  duration: '',
+  startTime: '',
+  results: []
+})
+
+// 漏洞摘要统计
+const vulnSummary = computed(() => {
+  const summary = { critical: 0, high: 0, medium: 0, low: 0 }
+
+  if (!currentScan.results || !Array.isArray(currentScan.results)) {
+    return summary
+  }
+
+  currentScan.results.forEach(result => {
+    const severity = (result.severity || '').toLowerCase()
+    switch(severity) {
+      case 'critical': summary.critical++; break
+      case 'high': summary.high++; break
+      case 'medium': summary.medium++; break
+      case 'low': summary.low++; break
+    }
+  })
+
+  return summary
 })
 
 // 当前选中的模板
@@ -184,46 +204,46 @@ const currentDate = ref(
 
 // 严重漏洞列表
 const criticalVulns = computed(() => {
-  return currentScan.vulnerabilities?.filter((v) => v.severity === 'critical') || []
+  if (!currentScan.results || !Array.isArray(currentScan.results)) return []
+  return currentScan.results.filter(v =>
+    v.severity && v.severity.toLowerCase() === 'critical'
+  )
 })
 
-// 扫描持续时间的文本表示
-const scanDurationText = computed(() => {
-  const duration = parseInt(currentScan.duration)
-  if (isNaN(duration)) return '0秒'
-
-  if (duration < 60) {
-    return `${duration}秒`
-  } else {
-    const minutes = Math.floor(duration / 60)
-    const seconds = duration % 60
-    return `${minutes}分${seconds}秒`
+// 格式化日期
+const formatTaskDate = (dateString) => {
+  if (!dateString) return '未知日期'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (e) {
+    return dateString
   }
-})
-
-// 扫描状态文本
-const scanStatusText = computed(() => {
-  switch (currentScan.status) {
-    case 'completed':
-      return '已完成'
-    case 'failed':
-      return '失败'
-    case 'scanning':
-      return '进行中'
-    default:
-      return currentScan.status || '未知状态'
-  }
-})
+}
 
 // 扫描类型标签
-const scanTypeLabel = (type) => {
-  switch (type) {
-    case 'web':
-      return 'Web扫描'
-    case 'binary':
-      return '二进制扫描'
-    default:
-      return type || '未知类型'
+const scanTypeLabel = (command) => {
+  if (!command) return '未知类型'
+  if (command.includes('--deep')) return '深度扫描'
+  if (command.includes('--fast')) return '快速扫描'
+  if (command.includes('--full')) return '全面扫描'
+  if (command.includes('--auth')) return '认证扫描'
+  return '基础扫描'
+}
+
+// 状态标签
+const statusLabel = (status) => {
+  switch (status) {
+    case 'completed': return '已完成'
+    case 'running': return '进行中'
+    case 'failed': return '失败'
+    default: return status || '未知状态'
   }
 }
 
@@ -231,15 +251,14 @@ const scanTypeLabel = (type) => {
 const loadScanHistory = async () => {
   try {
     loading.value = true
+    const response = await fetch('http://localhost:9000/tasks')
 
-    // 使用 Vite 的 glob 导入功能
-    const modules = import.meta.glob('/src/scan-details/scan-*.json', { eager: true })
+    if (!response.ok) {
+      throw new Error(`HTTP错误! 状态码: ${response.status}`)
+    }
 
-    // 提取扫描文件
-    scanHistory.value = Object.values(modules)
-      .map((module) => module.default)
-      .filter(Boolean)
-      .sort((a, b) => b.id.localeCompare(a.id))
+    const data = await response.json()
+    scanHistory.value = data.tasks || []
 
     // 默认选择第一条记录
     if (scanHistory.value.length > 0) {
@@ -309,23 +328,9 @@ onMounted(() => {
 })
 
 // 报告生成方法
-const generateReport = () => {
-  if (!selectedRecordId.value) {
-    ElMessage.warning('请选择扫描记录')
-    return
-  }
-
-  if (!selectedReportTemplateId.value) {
-    ElMessage.warning('请选择报告模板')
-    return
-  }
-
-  if (!selectedTemplate.value) {
-    ElMessage.error('所选模板不存在')
-    return
-  }
-
-  ElMessage.success(`"${selectedTemplate.value.name}"报告生成完成`)
+const goToReportParse = () => {
+  // 直接跳转到/report-parse页面
+  window.location.href = '/new-vulmind-frontend/report-parse';
 }
 
 // 其他操作方法
@@ -380,7 +385,7 @@ const shareReport = () => ElMessage.success('报告已分享')
   gap: 12px;
 }
 
-.report-header h2 {
+.rereport-header h2 {
   font-size: 1.6rem;
   font-weight: 600;
   color: #f1f5f9;

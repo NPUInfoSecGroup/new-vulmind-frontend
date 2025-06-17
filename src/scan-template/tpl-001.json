@@ -1,7 +1,7 @@
 {
   "id": "001",
   "name": "标准技术报告",
-  "content": "# 安全扫描报告\n\n## 扫描概述\n...",
+  "content": "# 安全扫描报告\n\n## 扫描概述\n- 扫描类型: \n- 扫描范围: \n- 时间范围: \n\n\n## 漏洞清单\n\n| ID | 风险 | 描述 |\n| --- | --- | --- |\n| VUL-001 | 高 | 示例描述 |\n\n\n",
   "isDefault": false,
   "created": "2023-08-12",
   "preview": "\n        <div class=\"template-preview-content\">\n          <h3>标准技术报告</h3>\n          <div class=\"preview-stats\">\n            <span class=\"stat-item\"><i class=\"fas fa-bug\"></i> 漏洞: 0</span>\n            <span class=\"stat-item\"><i class=\"fas fa-chart-pie\"></i> 风险评级: 中</span>\n          </div>\n          <div class=\"preview-sections\">\n            <p>扫描概述 | 漏洞列表 | 修复建议 | 合规检查</p>\n          </div>\n        </div>\n      "
