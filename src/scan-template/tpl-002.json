@@ -1,8 +1,8 @@
 {
-  "id": "tpl-002",
+  "id": "002",
   "name": "管理层摘要报告",
-  "isDefault": false,
+  "content": "# 安全风险摘要\n\n## 关键发现\n...\n",
+  "isDefault": true,
   "created": "2023-09-01",
-  "content": "# 安全风险摘要\n\n## 关键发现\n...",
-  "preview": "<div class=\"template-preview-content\"><h3>安全风险摘要</h3><div class=\"preview-stats\"><span class=\"stat-item\"><i class=\"fas fa-chart-pie\"></i> 风险评级: 高</span><span class=\"stat-item\"><i class=\"fas fa-clock\"></i> 预计修复: 3天</span></div><div class=\"preview-sections\"><p>执行摘要 | 风险评级 | 行动计划</p></div></div>"
+  "preview": "\n        <div class=\"template-preview-content\">\n          <h3>管理层摘要报告</h3>\n          <div class=\"preview-stats\">\n            <span class=\"stat-item\"><i class=\"fas fa-bug\"></i> 漏洞: 0</span>\n            <span class=\"stat-item\"><i class=\"fas fa-chart-pie\"></i> 风险评级: 中</span>\n          </div>\n          <div class=\"preview-sections\">\n            <p>扫描概述 | 漏洞列表 | 修复建议 | 合规检查</p>\n          </div>\n        </div>\n      "
 }

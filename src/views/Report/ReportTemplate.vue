@@ -31,7 +31,8 @@
         type="info"
         @click="selectTemplateFolder"
       >
-        <i class="fas fa-folder-open"></i> {{ currentFolder ? '切换文件夹' : '选择模板文件夹' }}
+        <i class="fas fa-folder-open"></i>
+        {{ currentFolder ? '切换文件夹' : '选择模板文件夹' }}
       </el-button>
 
       <el-button
@@ -69,12 +70,14 @@
           </div>
 
           <div class="template-actions">
+            <!-- 编辑按钮 -->
             <el-tooltip effect="dark" content="编辑模板" placement="top">
-              <el-button circle @click="editTemplate(template)">
+              <el-button circle class="action-edit" @click="editTemplate(template)">
                 <i class="fas fa-edit"></i>
               </el-button>
             </el-tooltip>
 
+            <!-- 默认按钮 -->
             <el-tooltip
               effect="dark"
               :content="template.isDefault ? '已是默认模板' : '设为默认模板'"
@@ -82,6 +85,7 @@
             >
               <el-button
                 circle
+                class="action-default"
                 :type="template.isDefault ? 'success' : ''"
                 @click="setAsDefault(template)"
               >
@@ -89,8 +93,9 @@
               </el-button>
             </el-tooltip>
 
+            <!-- 删除按钮 -->
             <el-tooltip effect="dark" content="删除模板" placement="top">
-              <el-button circle type="danger" @click="deleteTemplate(template)">
+              <el-button circle class="action-delete" type="danger" @click="deleteTemplate(template)">
                 <i class="fas fa-trash"></i>
               </el-button>
             </el-tooltip>
@@ -153,24 +158,44 @@
           </div>
         </div>
 
-        <!-- 功能工具栏 -->
+        <!-- 工具栏 -->
         <div class="editor-toolbar">
           <div class="toolbar-left">
-            <el-button circle @click="makeBold">
-              <i class="fas fa-bold"></i>
-            </el-button>
-            <el-button circle @click="makeItalic">
-              <i class="fas fa-italic"></i>
-            </el-button>
-            <el-button circle @click="makeUnderline">
-              <i class="fas fa-underline"></i>
-            </el-button>
-            <el-button circle @click="makeUnorderedList">
-              <i class="fas fa-list-ul"></i>
-            </el-button>
-            <el-button circle @click="makeOrderedList">
-              <i class="fas fa-list-ol"></i>
-            </el-button>
+            <el-tooltip effect="dark" content="加粗 (Ctrl+B)" placement="top">
+              <el-button circle class="toolbar-btn toolbar-bold" @click="makeBold">
+                <i class="fas fa-bold"></i>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="斜体 (Ctrl+I)" placement="top">
+              <el-button circle class="toolbar-btn toolbar-italic" @click="makeItalic">
+                <i class="fas fa-italic"></i>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="下划线" placement="top">
+              <el-button circle class="toolbar-btn toolbar-underline" @click="makeUnderline">
+                <i class="fas fa-underline"></i>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="无序列表" placement="top">
+              <el-button circle class="toolbar-btn toolbar-ul" @click="makeUnorderedList">
+                <i class="fas fa-list-ul"></i>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="有序列表" placement="top">
+              <el-button circle class="toolbar-btn toolbar-ol" @click="makeOrderedList">
+                <i class="fas fa-list-ol"></i>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="插入链接" placement="top">
+              <el-button circle class="toolbar-btn toolbar-link" @click="insertLink">
+                <i class="fas fa-link"></i>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="插入图片" placement="top">
+              <el-button circle class="toolbar-btn toolbar-image" @click="insertImage">
+                <i class="fas fa-image"></i>
+              </el-button>
+            </el-tooltip>
           </div>
 
           <div class="toolbar-right">
@@ -182,9 +207,7 @@
                 :value="item.value"
               />
             </el-select>
-            <el-button type="primary" @click="insertSection">
-              插入
-            </el-button>
+            <el-button type="primary" @click="insertSection">插入</el-button>
           </div>
         </div>
 
@@ -192,13 +215,13 @@
         <div class="editor-content">
           <!-- Markdown 编辑器 -->
           <div class="editor-pane">
-        <textarea
-          ref="markdownTextarea"
-          v-model="currentTemplate.content"
-          class="markdown-editor"
-          spellcheck="false"
-          placeholder="输入Markdown格式的模板内容..."
-        ></textarea>
+            <textarea
+              ref="markdownTextarea"
+              v-model="currentTemplate.content"
+              class="markdown-editor"
+              spellcheck="false"
+              placeholder="输入Markdown格式的模板内容..."
+            ></textarea>
           </div>
 
           <!-- 预览面板 -->
@@ -216,19 +239,13 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="editorVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveTemplate">
-            保存模板
-          </el-button>
+          <el-button type="primary" @click="saveTemplate">保存模板</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 导入模板对话框 -->
-    <el-dialog
-      v-model="importDialogVisible"
-      title="导入模板"
-      width="500px"
-    >
+    <el-dialog v-model="importDialogVisible" title="导入模板" width="500px">
       <div class="import-dialog">
         <p>请选择要导入的模板文件：</p>
         <el-upload
@@ -244,9 +261,7 @@
             拖放文件到此处或 <em>点击选择文件</em>
           </div>
           <template #tip>
-            <div class="el-upload__tip">
-              仅支持JSON格式文件
-            </div>
+            <div class="el-upload__tip">仅支持JSON格式文件</div>
           </template>
         </el-upload>
       </div>
@@ -881,6 +896,7 @@ export default {
 </script>
 
 <style scoped>
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css");
 /* 基础样式重置 */
 .report-template-view {
   border-radius: var(--border-radius);
@@ -1446,7 +1462,6 @@ h1 {
   background: rgba(51, 65, 85, 0.7);
 }
 
-/* ---------- 滚动条美化 ---------- */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -1498,5 +1513,147 @@ h1 {
   padding: 1em;
   overflow-x: auto;
   border-radius: 8px;
+}
+.template-actions .el-button i {
+  font-size: 1.15rem;
+}
+
+/* 编辑按钮 */
+.template-actions .el-button.action-edit {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #3b82f6;
+}
+.template-actions .el-button.action-edit:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(1.1);
+}
+
+/* 默认按钮 */
+.template-actions .el-button.action-default {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.35);
+  color: #fbbf24;
+}
+.template-actions .el-button.action-default:hover {
+  background: rgba(234, 179, 8, 0.3);
+  transform: scale(1.1);
+}
+
+/* 删除按钮 */
+.template-actions .el-button.action-delete {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+.template-actions .el-button.action-delete:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: scale(1.1);
+}
+
+/* 覆盖默认灰色图标颜色 */
+.template-actions .el-button.action-edit i,
+.template-actions .el-button.action-default i,
+.template-actions .el-button.action-delete i {
+  color: inherit; /* 继承父元素颜色 */
+}
+
+/* 维持原有阴影与圆形按钮样式 */
+.template-actions .el-button.action-edit,
+.template-actions .el-button.action-default,
+.template-actions .el-button.action-delete {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+.toolbar-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.toolbar-btn i {
+  pointer-events: none;
+  font-size: 1rem;
+  color: inherit;
+}
+
+/* 个性化颜色 */
+.toolbar-bold {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #3b82f6;
+}
+.toolbar-bold:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+.toolbar-italic {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.35);
+  color: #8b5cf6;
+}
+.toolbar-italic:hover {
+  background: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+.toolbar-underline {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+.toolbar-underline:hover {
+  background: rgba(16, 185, 129, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+.toolbar-ul {
+  background: rgba(250, 204, 21, 0.15);
+  border-color: rgba(250, 204, 21, 0.35);
+  color: #facc15;
+}
+.toolbar-ul:hover {
+  background: rgba(250, 204, 21, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+.toolbar-ol {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #f43f5e;
+}
+.toolbar-ol:hover {
+  background: rgba(244, 63, 94, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+.toolbar-link {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #6366f1;
+}
+.toolbar-link:hover {
+  background: rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+.toolbar-image {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #22c55e;
+}
+.toolbar-image:hover {
+  background: rgba(34, 197, 94, 0.3);
+  transform: translateY(-2px) scale(1.08);
+}
+
+/* 覆盖默认灰色图标颜色 */
+.toolbar-btn i {
+  color: inherit;
 }
 </style>
