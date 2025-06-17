@@ -181,7 +181,7 @@ const sendMessage = async () => {
 // DeepSeek API调用
 const callDeepSeekAPI = async (inputText) => {
   const apiUrl = 'https://api.deepseek.com/v1/chat/completions';
-  const apiKey = 'sk-cc8300aca20d492f8d4726bf1510bb84';
+  const apiKey = 'xxx';
 
   const response = await fetch(apiUrl, {
     method: 'POST',
