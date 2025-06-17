@@ -3,13 +3,6 @@
     <el-scrollbar ref="scrollbarRef" class="chat-panel">
       <div class="message">
         <div v-for="(msg, i) in messages" :key="i">
-          <!-- <p>
-            <strong
-              >{{
-                msg.role === 'user' ? '👤 你' : msg.role === 'assistant' ? '🤖 AI' : '📢 系统'
-              }}：</strong
-            >
-          </p> -->
           <div v-html="renderContent(msg.content)" class="markdown-body"></div>
         </div>
       </div>
@@ -18,41 +11,68 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute } from 'vue-router'
-import { useChatStore } from '@/stores/chat'
-import { useTaskStore } from '@/stores/task'
-import { computed, onMounted, watch, ref, nextTick } from 'vue'
+// import { useRoute } from 'vue-router'
+// import { useChatStore } from '@/stores/chat'
+// import { useTaskStore } from '@/stores/task'
+// import { computed, onMounted, watch, ref, nextTick } from 'vue'
 import MarkdownIt from 'markdown-it'
 
-const route = useRoute()
-const taskID = route.params.taskID as string
-const chatStore = useChatStore()
-const taskStore = useTaskStore()
+// const route = useRoute()
+// const taskID = route.params.taskID as string
+// const chatStore = useChatStore()
+// const taskStore = useTaskStore()
 
-const scrollbarRef = ref<InstanceType<(typeof import('element-plus'))['ElScrollbar']> | null>(null)
+// const scrollbarRef = ref<InstanceType<(typeof import('element-plus'))['ElScrollbar']> | null>(null)
 
-const messages = computed(() => chatStore.getMessages(taskID))
-const task = computed(() => taskStore.getById(taskID))
+// const messages = computed(() => chatStore.getMessages(taskID))
+// const task = computed(() => taskStore.getById(taskID))
 
-onMounted(async () => {
-  await chatStore.fetchAllConversations()
+// onMounted(async () => {
+//   await chatStore.fetchAllConversations()
 
-  if (chatStore.getMessages(taskID).length === 0) {
-    const defaultMsg = {
-      role: 'user' as 'user',
-      content: task.value.command,
-      timestamp: new Date().toISOString(),
-    }
+//   if (chatStore.getMessages(taskID).length === 0) {
+//     const defaultMsg = {
+//       role: 'user' as 'user',
+//       content: task.value.command,
+//       timestamp: new Date().toISOString(),
+//     }
 
-    // await chatStore.sendMessage(taskID, defaultMsg)
+//     // await chatStore.sendMessage(taskID, defaultMsg)
 
-    await chatStore.streamReceive(taskID, (msg) => {
-      console.log('assistant 回复:', msg.content)
-    })
-  }
-})
+//     await chatStore.streamReceive(taskID, (msg) => {
+//       console.log('assistant 回复:', msg.content)
+//     })
+//   }
+// })
 
 // 监听 messages 变化，自动滚动到底部
+
+const md = new MarkdownIt()
+
+const renderContent = (content: string) => {
+  return md.render(content)
+}
+
+/////////////////////////////\
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import axios from 'axios'
+
+const config = reactive({
+  target: '',
+  goal: '',
+})
+const agentStarted = ref(false)
+const agentRunning = ref(false)
+const messages = ref<{ role: string; content: string }[]>([])
+const initLoading = ref(false)
+const scrollbarRef = ref<any>()
+let pollingTimer: any = null
+
+// 聊天记录自动保存/恢复
+onMounted(() => {
+  const saved = localStorage.getItem('agent-chat-history')
+  if (saved) messages.value = JSON.parse(saved)
+})
 watch(
   messages,
   async () => {
@@ -67,11 +87,66 @@ watch(
   },
   { deep: true, immediate: true },
 )
+async function startAgent() {
+  if (!config.target || !config.goal) {
+    return alert('请填写目标和测试目的')
+  }
+  initLoading.value = true
+  try {
+    // 1. 启动 agent 模式
+    await axios.post('http://localhost:8000/agent/start', {
+      target: config.target,
+      goal: config.goal,
+      iteration_limit: 20,
+    })
+    agentStarted.value = true
+    agentRunning.value = true
+    messages.value.push({ role: 'system', content: '➡️ Agent 模式已启动，正在自动进行渗透测试...' })
+    await nextTick()
+    scrollbarRef.value?.setScrollTop(999999)
+    // 2. 开始自动轮询/拉取 agent 步骤直到结束
+    pollAgentSteps()
+  } catch (err) {
+    messages.value.push({ role: 'system', content: '❌ 启动失败，请检查后端' })
+    agentStarted.value = false
+    agentRunning.value = false
+  }
+  initLoading.value = false
+}
 
-const md = new MarkdownIt()
+async function pollAgentSteps() {
+  if (!agentRunning.value) return
 
-const renderContent = (content: string) => {
-  return md.render(content)
+  try {
+    // 执行一次 agent 的 step
+    const res = await axios.post('http://localhost:8000/agent/step')
+    const logs = res.data.logs || []
+    // 追加本次AI输出
+    if (logs.length) {
+      // 去重，只追加新内容
+      const newMsg = logs[logs.length - 1]?.ai_response || '(无返回)'
+      if (!messages.value.length || messages.value[messages.value.length - 1].content !== newMsg) {
+        messages.value.push({ role: 'ai', content: newMsg })
+      }
+    }
+
+    // 检查Agent状态，决定是否继续
+    const statusResp = await axios.get('http://localhost:8000/agent/status')
+    if (statusResp.data.running === false) {
+      messages.value.push({ role: 'system', content: '✅ Agent 已完成全部渗透任务！' })
+      agentRunning.value = false
+      agentStarted.value = false
+      return
+    }
+    // 递归继续下一步
+    pollingTimer = setTimeout(pollAgentSteps, 1000)
+    await nextTick()
+    scrollbarRef.value?.setScrollTop(999999)
+  } catch (err) {
+    messages.value.push({ role: 'system', content: '❌ Agent 步骤执行失败或中断！' })
+    agentRunning.value = false
+    agentStarted.value = false
+  }
 }
 </script>
 
