@@ -1,28 +1,4 @@
-<template>
-  <div class="demo-collapse-position">
-    <el-collapse :expand-icon-position="position">
-      <el-collapse-item title="模型配置" name="1">
-        <p>模型厂商</p>
-        <el-select v-model="value" placeholder="Select" size="large">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-        <p>base_url</p>
-        <el-input v-model="base_url" placeholder="请输入base_url" size="large"></el-input>
-        <p>api_key</p>
-        <el-input v-model="api_key" placeholder="请输入模型名称" size="large"></el-input>
-      </el-collapse-item>
-      <el-collapse-item title="服务器配置" name="2">
-        <p>服务器地址</p>
-        <el-input v-model="serve_url" placeholder="请输入base_url" size="large"></el-input>
-      </el-collapse-item>
-    </el-collapse>
-  </div>
-</template>
+<template></template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'

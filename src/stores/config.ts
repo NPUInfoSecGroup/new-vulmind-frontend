@@ -7,7 +7,7 @@ export interface ServeConfig {
 
 export interface LLMConfig {
   /** LLM 厂商 */
-  modelProvider: 'openai' | 'azure' | 'anthropic' | 'google' | 'local'
+  modelProvider: string
   /** 模型名称 */
   modelName?: string
   /** 模型版本 */
