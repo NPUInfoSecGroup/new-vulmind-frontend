@@ -330,7 +330,7 @@ onMounted(() => {
 // 报告生成方法
 const goToReportParse = () => {
   // 直接跳转到/report-parse页面
-  window.location.href = '/new-vulmind-frontend/report-parse';
+  window.location.href = '/new-vulmind-frontend/#/report-parse/';
 }
 
 // 其他操作方法
