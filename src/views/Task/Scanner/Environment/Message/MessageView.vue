@@ -16,6 +16,10 @@
 // import { useTaskStore } from '@/stores/task'
 // import { computed, onMounted, watch, ref, nextTick } from 'vue'
 import MarkdownIt from 'markdown-it'
+import { useConfigStore } from '@/stores/config'
+
+const configStore = useConfigStore()
+const baseUrl = configStore.getServerUrl
 
 // const route = useRoute()
 // const taskID = route.params.taskID as string
@@ -56,6 +60,7 @@ const renderContent = (content: string) => {
 /////////////////////////////\
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import axios from 'axios'
+import { c } from 'vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf'
 
 const config = reactive({
   target: '',
