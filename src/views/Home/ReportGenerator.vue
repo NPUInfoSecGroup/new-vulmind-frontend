@@ -368,7 +368,6 @@ const shareReport = () => ElMessage.success('报告已分享')
 /* 整体容器 - 宽度调整为100% */
 .report-generator {
   width: 100%; /* 拉伸到整个宽度 */
-  background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
   color: var(--text-primary);
   border-radius: 16px;
   overflow: hidden;

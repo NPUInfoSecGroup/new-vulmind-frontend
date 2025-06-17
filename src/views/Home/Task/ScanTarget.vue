@@ -182,6 +182,8 @@ function cancel() {
 
 .form-group {
   margin-bottom: 18px;
+  margin-left: 1rem;
+  margin-right: 1rem;
 }
 
 .form-label {

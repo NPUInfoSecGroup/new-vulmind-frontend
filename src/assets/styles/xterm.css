@@ -324,3 +324,17 @@
 .xterm .xterm-scrollable-element>.shadow.top.left {
     box-shadow: var(--vscode-scrollbar-shadow, #000) 6px 0 6px -6px inset;
 }
+
+.xterm .xterm-viewport {
+    background-color: rgb(25 32 52) !important;
+}
+
+.xterm .xterm-rows>div {
+    letter-spacing: 0.05em !important;
+    font-family: var(--md-code-font);
+    margin: .5rem 1rem;
+}
+
+.xterm-dom-renderer-owner-2 .xterm-rows {
+    margin: 1rem;
+}

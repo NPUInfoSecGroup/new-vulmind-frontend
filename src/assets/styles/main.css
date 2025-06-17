@@ -68,7 +68,7 @@ pre {
 }
 
 body {
-    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    background-color: #0a1220;
     color: var(--text-primary);
     height: auto;
     overflow-x: hidden;
@@ -618,7 +618,6 @@ button.el-button.is-circle {
 }
 
 .el-select-dropdown__wrap,
-.el-scrollbar,
 .el-select-dropdown__list,
 .el-select-dropdown__item,
 .el-select-dropdown,
@@ -628,7 +627,7 @@ button.el-button.is-circle {
     border-radius: .5rem;
     backdrop-filter: blur(10px);
     color: #ffffff;
-    font-weight: 700;
+    /* font-weight: 700; */
 }
 
 .el-select-dropdown__list {
@@ -688,4 +687,11 @@ button.el-button {
     backdrop-filter: blur(20px);
     background: #171c20c2;
     border-radius: 1rem;
+}
+
+.fa-solid,
+.fas {
+    font-weight: 900;
+    margin: 10px;
+    /* padding: 10px; */
 }

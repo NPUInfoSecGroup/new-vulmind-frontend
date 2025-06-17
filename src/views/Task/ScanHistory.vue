@@ -952,6 +952,7 @@ label.filter-label {
   align-items: center;
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 .target-info {
   background-color: #081322;

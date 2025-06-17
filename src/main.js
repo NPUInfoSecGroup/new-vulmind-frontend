@@ -6,6 +6,7 @@ import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import '@/assets/styles/xterm.css'
 import './assets/styles/main.css'
+import '@/assets/styles/github-markdown-dark.css'
 import { createPinia } from 'pinia'
 
 // 创建Vue应用实例
