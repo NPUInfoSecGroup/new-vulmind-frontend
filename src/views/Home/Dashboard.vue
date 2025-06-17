@@ -3,38 +3,44 @@
     <!-- 顶部标题栏 -->
     <header class="app-header">
       <div class="header-content">
-        <h1 class="app-title">
-          <!-- <i class="fas fa-shield-alt" /> -->
-          VulMind
-        </h1>
+        <h1 class="app-title">VulMind</h1>
         <p class="app-subtitle">可拓展大模型漏洞扫描平台</p>
       </div>
     </header>
 
-    <!-- 主内容区 -->
-    <ScannerQuicker />
-    <ReportGenerator />
+    <!-- 主内容区 - 填满宽度 -->
+    <div class="main-content">
+      <!-- 漏洞概览组件 -->
+      <VulnerabilityOverview
+        :scan-count="8"
+        :critical="9"
+        :high="7"
+        :medium="13"
+        :low="11"
+      />
+
+      <!-- 其他组件 -->
+      <ScannerQuicker />
+      <ReportGenerator />
+    </div>
   </div>
 </template>
 
 <script setup>
 import ReportGenerator from '@/views/Home/ReportGenerator.vue'
 import ScannerQuicker from './ScannerQuicker.vue'
+import VulnerabilityOverview from './VulnerabilityOverview.vue'
 </script>
 
 <style scoped>
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  height: auto;
-  background: var(--dark-bg);
-  color: var(--text-primary);
-  padding: 24px;
-  overflow-x: hidden;
-  position: relative;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  gap: 20px;
+  background: #0a1220; /* 更深的背景 */
+  color: #fff;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .dashboard-container::before {
@@ -42,142 +48,93 @@ import ScannerQuicker from './ScannerQuicker.vue'
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 15% 25%, rgba(67, 97, 238, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 85% 35%, rgba(67, 97, 238, 0.12) 0%, transparent 45%),
-    radial-gradient(circle at 50% 90%, rgba(67, 97, 238, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 90% 30%, rgba(67, 97, 238, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(67, 97, 238, 0.15) 0%, transparent 45%);
   pointer-events: none;
   z-index: 0;
-  filter: blur(60px);
+  filter: blur(80px);
 }
 
-/***********************************
- * 顶部 Header
- ***********************************/
+/* 顶部标题区域 - 填满宽度 */
 .app-header {
-  background: linear-gradient(135deg, #1e244d 0%, #2d3771 100%);
-  border-radius: var(--border-radius);
-  padding: 32px 28px 24px;
-  box-shadow: var(--box-shadow);
+  background: linear-gradient(135deg, #161d3a 0%, #2a3468 100%);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  margin-bottom: 25px;
   position: relative;
   z-index: 1;
-  overflow: hidden;
-  margin-bottom: 1rem;
+  border: 1px solid rgba(100, 120, 220, 0.3);
 }
-.app-header::after {
-  content: '';
-  position: absolute;
-  top: -40%;
-  right: -40%;
-  width: 90%;
-  height: 180%;
-  background: radial-gradient(circle, rgba(0, 219, 222, 0.25) 0%, transparent 70%);
-  transform: rotate(25deg);
-  pointer-events: none;
+
+.app-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #8c9bff, #4fa3f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px rgba(140, 155, 255, 0.4);
 }
-.header-content {
+
+.app-subtitle {
+  font-size: 1.4rem;
+  color: rgba(200, 210, 255, 0.9);
+  margin: 0;
+  letter-spacing: 0.5px;
+  font-weight: 300;
+}
+
+/* 主内容区 - 填满宽度 */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   position: relative;
   z-index: 2;
-  text-align: center;
-}
-.app-title {
-  font-size: clamp(1.8rem, 2.2vw + 1rem, 2.75rem);
-  font-weight: 700;
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  justify-content: center;
-}
-.app-title i {
-  color: var(--accent);
-}
-.app-subtitle {
-  font-size: 1rem;
-  max-width: 640px;
-  margin: 0.5rem auto 0;
-  color: rgba(255, 255, 255, 0.85);
 }
 
-/***********************************
- * 顶部导航按钮
- ***********************************/
-.nav-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin-top: 28px;
-  flex-wrap: wrap;
-}
-.nav-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border-radius: var(--border-radius);
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  text-decoration: none;
-  transition: var(--transition);
-  backdrop-filter: blur(5px);
-}
-.nav-button:hover {
-  background: var(--accent);
-  color: #1a202c;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.45);
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .main-content {
+    max-width: 95%;
+  }
+
+  .app-title {
+    font-size: 3rem;
+  }
 }
 
-/***********************************
- * 主内容区：上两并排，下单行
- ***********************************/
-.dashboard-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    'target status'
-    'report report';
-  gap: 20px;
-  grid-auto-rows: 1fr;
-}
-.target-area {
-  grid-area: target;
-}
-.status-area {
-  grid-area: status;
-}
-.report-area {
-  grid-area: report;
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .app-header {
+    padding: 20px 15px;
+  }
+
+  .app-title {
+    font-size: 2.5rem;
+  }
+
+  .app-subtitle {
+    font-size: 1.2rem;
+  }
 }
 
-/***********************************
- * 模块包裹器
- ***********************************/
-.module-wrapper {
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  padding: 26px 24px;
-  box-shadow: var(--box-shadow);
-  border: 1px solid var(--border);
-  transition: var(--transition);
-  overflow: hidden;
-  height: 100%;
-}
-.module-wrapper:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
-}
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 2.2rem;
+  }
 
-/***********************************
- * 响应式：窄屏堆叠
- ***********************************/
-@media (max-width: 1024px) {
-  .dashboard-content {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'target'
-      'status'
-      'report';
+  .app-subtitle {
+    font-size: 1.0rem;
   }
 }
 </style>

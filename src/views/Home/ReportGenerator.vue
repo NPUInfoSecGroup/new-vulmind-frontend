@@ -33,8 +33,11 @@
           <!-- 报告模板选择 -->
           <div class="select-row">
             <div class="select-label">报告模板：</div>
-            <select v-model="selectedReportTemplate" class="select-input">
-              <option v-for="tpl in reportTemplates" :key="tpl.id" :value="tpl.value">
+            <div v-if="loadingTemplates" class="loading-templates">
+              <i class="fas fa-spinner fa-spin"></i> 加载模板中...
+            </div>
+            <select v-else v-model="selectedReportTemplateId" class="select-input">
+              <option v-for="tpl in reportTemplates" :key="tpl.id" :value="tpl.id">
                 {{ tpl.name }}
               </option>
             </select>
@@ -136,18 +139,17 @@ import { ElMessage } from 'element-plus'
 
 export default {
   name: 'ReportGenerator',
-  props: {
-    reportTemplates: {
-      type: Array,
-      default: () => [
-        { id: 'std', value: 'standard', name: '标准模板' },
-        { id: 'pro', value: 'professional', name: '专业模板' },
-      ],
-    },
-  },
   setup() {
     // 扫描历史记录
     const scanHistory = ref([])
+
+    // 报告模板
+    const reportTemplates = ref([])
+    const loadingTemplates = ref(true)
+    const templateLoadError = ref(false)
+
+    // 当前选中的模板ID
+    const selectedReportTemplateId = ref(null)
 
     // 当前选中的扫描记录
     const currentScan = reactive({
@@ -161,12 +163,15 @@ export default {
       vulnerabilities: [],
     })
 
+    // 当前选中的模板
+    const selectedTemplate = computed(() => {
+      return reportTemplates.value.find(t => t.id === selectedReportTemplateId.value) || null
+    })
+
     // 加载状态
     const loading = ref(true)
 
     // 表单数据
-    const selectedReportTemplate = ref('standard')
-    const selectedRecordId = ref(null)
     const reporterName = ref('系统管理员')
     const currentDate = ref(
       new Date().toLocaleDateString('zh-CN', {
@@ -248,6 +253,40 @@ export default {
       }
     }
 
+    // 动态加载报告模板
+    const loadReportTemplates = async () => {
+      try {
+        loadingTemplates.value = true;
+
+        // 使用 Vite 的 glob 导入功能从 scan-template 目录加载模板
+        const modules = import.meta.glob('/src/scan-template/*.json', { eager: true });
+
+        // 提取模板数据
+        const templates = Object.values(modules)
+          .map(module => module.default)
+          .filter(Boolean);
+
+        // 按创建日期排序，最新的在前
+        templates.sort((a, b) => new Date(b.created) - new Date(a.created));
+
+        reportTemplates.value = templates;
+
+        // 设置默认选中：找到第一个标记为默认的或第一个模板
+        const defaultTemplate = templates.find(t => t.isDefault) || templates[0];
+        if (defaultTemplate) {
+          selectedReportTemplateId.value = defaultTemplate.id;
+        }
+
+        templateLoadError.value = false;
+      } catch (e) {
+        console.error('加载报告模板失败:', e);
+        ElMessage.error('加载报告模板失败: ' + e.message);
+        templateLoadError.value = true;
+      } finally {
+        loadingTemplates.value = false;
+      }
+    }
+
     // 处理扫描记录选择
     const handleScanSelection = () => {
       if (!selectedRecordId.value) return
@@ -264,7 +303,8 @@ export default {
 
     // 组件挂载时加载数据
     onMounted(() => {
-      loadScanHistory()
+      loadScanHistory();
+      loadReportTemplates();
     })
 
     // 报告生成方法
@@ -274,7 +314,17 @@ export default {
         return
       }
 
-      ElMessage.success(`"${selectedReportTemplate.value}"报告生成完成`)
+      if (!selectedReportTemplateId.value) {
+        ElMessage.warning('请选择报告模板')
+        return
+      }
+
+      if (!selectedTemplate.value) {
+        ElMessage.error('所选模板不存在')
+        return
+      }
+
+      ElMessage.success(`"${selectedTemplate.value.name}"报告生成完成`)
     }
 
     // 其他操作方法
@@ -284,9 +334,12 @@ export default {
 
     return {
       scanHistory,
+      reportTemplates,
+      loadingTemplates,
+      templateLoadError,
       currentScan,
-      selectedReportTemplate,
-      selectedRecordId,
+      selectedReportTemplateId,
+      selectedTemplate,
       reporterName,
       currentDate,
       loading,
@@ -601,23 +654,16 @@ export default {
 }
 
 /* 加载中状态 */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.8);
+.loading-templates {
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 10;
-}
-
-.loading-spinner {
-  font-size: 2rem;
-  color: #60a5fa;
-  animation: spin 1s linear infinite;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.5);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  width: 100%;
 }
 
 @keyframes spin {

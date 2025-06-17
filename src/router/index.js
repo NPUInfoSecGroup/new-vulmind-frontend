@@ -50,6 +50,12 @@ const routes = [
     meta: { title: app + ' - 调试' }, // 此处加自定义字段
     component: () => import('@/views/example.vue'), // 显示扫描页内容
   },
+  {
+    path: '/test01',
+    name: 'Config',
+    meta: { title: app + ' - 调试' }, // 此处加自定义字段
+    component: () => import('@/views/Report/ReportParse.vue'), // 显示扫描页内容
+  }
 ]
 
 const router = createRouter({
