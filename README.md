@@ -30,6 +30,6 @@ npm run build
 
 # 前端连接
 
-如果你有一个Github服务器可以访问到url可以填写在用户配置上进行连接。
+运行app.py后端地址可以填写在用户配置上进行连接。
 
 ![alt text](assets/image.png)
