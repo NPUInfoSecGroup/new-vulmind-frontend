@@ -5,8 +5,12 @@
         <h2>环境信息</h2>
         <div class="message-card">
           <div class="header-title">
-            <span class="target">{{ task && task.target }}</span>
-            <span class="command">{{ task && task.command }}</span>
+            <span class="scanner-name">
+              <span class="target">{{ task && task.target }}</span>
+            </span>
+            <span class="scanner-name">
+              <span class="command">{{ task && task.command }}</span>
+            </span>
           </div>
           <div class="action">
             <el-button type="primary" @click="start"> 执行任务 </el-button>
@@ -168,6 +172,7 @@ watch(
   align-content: space-around;
   align-items: center;
   width: 100%;
+  gap: 10px;
 }
 .terminal-content {
   height: 30vh;
@@ -206,5 +211,31 @@ h2 {
 .terminal {
   border-radius: 1rem;
   box-shadow: var(--box-shadow);
+}
+span.scanner-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.message-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* 让它占满剩余空间 */
+  overflow: hidden;
+}
+
+.scanner-name,
+.command {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

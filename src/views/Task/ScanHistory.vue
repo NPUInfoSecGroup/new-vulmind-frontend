@@ -74,7 +74,9 @@
         <el-card class="scan-history-card" shadow="hover">
           <div class="scanner-header">
             <div class="name">
-              {{ row.name || `扫描记录 ${index + 1}` }}
+              <span class="scanner-name">
+                {{ row.name || `扫描记录 ${index + 1}` }}
+              </span>
               <el-tag
                 :type="/^(?:\d{1,3}\.){3}\d{1,3}$/.test(row.target) ? 'warning' : 'primary'"
                 class="scan-type-tag"
@@ -1011,5 +1013,12 @@ label.filter-label {
 .info-item.failed {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
+}
+span.scanner-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

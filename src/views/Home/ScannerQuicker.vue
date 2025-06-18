@@ -34,7 +34,9 @@
             >
               <div class="scanner-header">
                 <div class="name">
-                  {{ item.name }}
+                  <span class="scanner-name">
+                    {{ item.name }}
+                  </span>
                   <el-tag
                     :type="/^(?:\d{1,3}\.){3}\d{1,3}$/.test(item.target) ? 'warning' : 'primary'"
                     class="scan-type-tag"
@@ -613,5 +615,12 @@ const handleScanCancel = () => {
 .info-item.failed {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
+}
+span.scanner-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
