@@ -5,11 +5,14 @@
         <h2>环境信息</h2>
         <div class="message-card">
           <div class="header-title">
-            <span class="target">{{ task.target }}</span>
-            <span class="command">{{ task.command }}</span>
+            <span class="target">{{ task && task.target }}</span>
+            <span class="command">{{ task && task.command }}</span>
           </div>
           <div class="action">
-            <el-button type="primary" @click="start" v-if="task.status == 'pending'">
+            <el-button
+              type="primary"
+              @click="start"
+              v-if="task?.status == 'pending'">
               执行任务
             </el-button>
           </div>
@@ -26,7 +29,9 @@
   </div>
 </template>
 
+
 <script lang="ts" setup>
+import type { Task } from '@/stores/task'
 import { useRoute } from 'vue-router'
 import { useTaskStore } from '@/stores/task'
 import MessageView from './Message/MessageView.vue'
@@ -36,28 +41,41 @@ import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 const route = useRoute()
 const taskID = route.params.taskID as string
 const taskStore = useTaskStore()
-const task = ref(taskStore.getById(taskID))
 
-// 定时器和轮询状态标志
-const statusPollingInterval = ref<NodeJS.Timeout | null>(null)
+// 初始化为安全默认值
+const task = ref<Task>(taskStore.safeGetById(taskID))
+
+// 修复 1: 使用 number 类型替代 NodeJS.Timeout (浏览器环境兼容)
+const statusPollingInterval = ref<number | null>(null)
 const isPolling = ref(false)
 
 // 启动状态轮询
 const startStatusPolling = () => {
-  // 避免重复轮询或不必要的轮询
-  if (isPolling.value || task.value?.status === 'completed' || task.value?.status === 'failed') {
-    return
-  }
+  // 修复 2: 避免使用 includes() 方法（兼容性问题）
+  const isFinished = task.value?.status === 'completed' || task.value?.status === 'failed'
+
+  // 确保任务存在且状态允许轮询
+  const shouldStart =
+    task.value?.id &&
+    !isPolling.value &&
+    !isFinished
+
+  if (!shouldStart) return
 
   isPolling.value = true
 
-  statusPollingInterval.value = setInterval(async () => {
+  statusPollingInterval.value = window.setInterval(async () => {
     try {
       await taskStore.fetchTasks()
-      task.value = taskStore.getById(taskID)
 
-      if (task.value?.status === 'completed' || task.value?.status === 'failed') {
-        console.log(`任务 ${taskID} 已结束，状态: ${task.value.status}`)
+      // 更新任务数据
+      const updatedTask = taskStore.safeGetById(taskID)
+      task.value = updatedTask
+
+      // 检查任务是否结束
+      const updatedIsFinished = task.value?.status === 'completed' || task.value?.status === 'failed'
+
+      if (updatedIsFinished) {
         stopStatusPolling()
       }
     } catch (error) {
@@ -69,7 +87,7 @@ const startStatusPolling = () => {
 
 // 停止状态轮询
 const stopStatusPolling = () => {
-  if (statusPollingInterval.value) {
+  if (statusPollingInterval.value !== null) {
     clearInterval(statusPollingInterval.value)
     statusPollingInterval.value = null
   }
@@ -77,14 +95,24 @@ const stopStatusPolling = () => {
 }
 
 // 启动任务
-function start() {
-  taskStore.startTask(taskID)
-  startStatusPolling()
+async function start() {
+  if (!task.value?.id) return
+
+  try {
+    await taskStore.startTask(taskID)
+    startStatusPolling()
+  } catch (error) {
+    console.error('启动任务失败:', error)
+  }
 }
 
 // 组件挂载时开始轮询
 onMounted(() => {
-  startStatusPolling()
+  // 首次加载任务数据
+  taskStore.fetchTasks().then(() => {
+    task.value = taskStore.safeGetById(taskID)
+    startStatusPolling()
+  })
 })
 
 // 组件卸载前停止轮询
@@ -96,12 +124,17 @@ onBeforeUnmount(() => {
 watch(
   () => taskStore.getById(taskID),
   (newTask) => {
-    task.value = newTask
-    if (newTask?.status === 'completed' || newTask?.status === 'failed') {
-      stopStatusPolling()
+    if (newTask) {
+      task.value = newTask
+
+      // 修复 2: 避免使用 includes() 方法
+      // 如果任务完成或失败，停止轮询
+      if (newTask.status === 'completed' || newTask.status === 'failed') {
+        stopStatusPolling()
+      }
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 </script>
 
