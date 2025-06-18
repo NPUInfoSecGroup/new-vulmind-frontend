@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container>
       <el-aside width="50%" class="aside">
-        <h2>环境信息</h2>
+        <h2>任务信息</h2>
         <div class="message-card">
           <div class="header-title">
             <span class="scanner-name">
@@ -21,7 +21,7 @@
         </div>
       </el-aside>
       <el-main>
-        <h2>扫描过程</h2>
+        <h2>扫描结果</h2>
         <MessageView />
       </el-main>
     </el-container>

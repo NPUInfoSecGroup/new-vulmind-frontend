@@ -10,7 +10,7 @@
       <img style="height: 40px" src="@/assets/logo.png" alt="Element logo" />
     </el-menu-item>
     <el-menu-item index="1" @click="goScanHistory">扫描历史</el-menu-item>
-    <el-menu-item index="2" @click="goDocument">报告生成</el-menu-item>
+    <el-menu-item index="2" @click="goDocument">报告模板</el-menu-item>
     <!-- <el-menu-item index="3" @click="goChat">聊天界面</el-menu-item> -->
     <el-menu-item index="-1" @click="goConfigList">用户配置</el-menu-item>
   </el-menu>
