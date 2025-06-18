@@ -22,7 +22,7 @@ const configStore = useConfigStore()
 const taskStore = useTaskStore()
 const taskID = route.params.taskID as string
 const task = taskStore.safeGetById(taskID)
-const baseUrl = configStore.getServerUrl
+const baseUrl = configStore.getMCPServerUrl
 
 const md = new MarkdownIt()
 
@@ -71,7 +71,7 @@ async function startAgent() {
   try {
     // 1. 启动 agent 模式
     console.log('正在启动 Agent 模式...')
-    await axios.post('http://localhost:8000/agent/start', {
+    await axios.post(baseUrl + '/agent/start', {
       target: config.target,
       goal: config.goal,
       id: task.id,
@@ -110,7 +110,7 @@ async function pollAgentSteps() {
 
   try {
     // 执行一次 agent 的 step
-    const res = await axios.post('http://localhost:8000/agent/step')
+    const res = await axios.post(baseUrl + '/agent/step')
     const logs = res.data.logs || []
     // 追加本次AI输出
     if (logs.length) {
@@ -122,7 +122,7 @@ async function pollAgentSteps() {
     }
 
     // 检查Agent状态，决定是否继续
-    const statusResp = await axios.get('http://localhost:8000/agent/status')
+    const statusResp = await axios.get(baseUrl + '/agent/status')
     if (statusResp.data.running === false) {
       // messages.value.push({ role: 'system', content: '✅ Agent 已完成全部渗透任务！' })
       agentRunning.value = false

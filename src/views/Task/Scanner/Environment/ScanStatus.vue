@@ -6,7 +6,11 @@
         <button class="control-btn" @click="clearOutput" title="清空输出">
           <i class="fas fa-trash" />
         </button>
-        <button class="control-btn" @click="toggleAutoScroll" :title="autoScroll ? '暂停滚动' : '启用滚动'">
+        <button
+          class="control-btn"
+          @click="toggleAutoScroll"
+          :title="autoScroll ? '暂停滚动' : '启用滚动'"
+        >
           <i class="fas" :class="autoScroll ? 'fa-pause' : 'fa-play'" />
         </button>
         <button class="control-btn" @click="copyOutput" title="复制全部">
@@ -29,7 +33,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useConfigStore } from '@/stores/config'
 import axios from 'axios'
+
+const configStore = useConfigStore()
+const base_url = configStore.getMCPServerUrl
 
 const outputLines = ref<{ content: string }[]>([])
 const offset = ref(0)
@@ -43,8 +51,8 @@ const POLL_INTERVAL = 800 // ms
 // 拉取后端新行
 async function fetchOutput() {
   try {
-    const res = await axios.get('http://localhost:8000/scan/output', {
-      params: { offset: offset.value }
+    const res = await axios.get(base_url + '/scan/output', {
+      params: { offset: offset.value },
     })
     const newLines = res.data.lines || []
     if (newLines.length > 0) {
@@ -76,7 +84,9 @@ function scrollToBottom() {
 function handleScroll() {
   if (!outputContainer.value) return
   // 判断是否在底部
-  const isAtBottom = outputContainer.value.scrollTop + outputContainer.value.clientHeight >= outputContainer.value.scrollHeight - 20
+  const isAtBottom =
+    outputContainer.value.scrollTop + outputContainer.value.clientHeight >=
+    outputContainer.value.scrollHeight - 20
   autoScroll.value = isAtBottom
 }
 
@@ -91,7 +101,7 @@ function toggleAutoScroll() {
 }
 
 function copyOutput() {
-  const text = outputLines.value.map(l => l.content).join('\n')
+  const text = outputLines.value.map((l) => l.content).join('\n')
   navigator.clipboard.writeText(text)
 }
 
@@ -112,7 +122,7 @@ onUnmounted(() => {
   flex-direction: column;
   background: #151a23;
   border-radius: 1rem;
-  border: 1px solid rgba(100,116,139,0.15);
+  border: 1px solid rgba(100, 116, 139, 0.15);
 }
 .card-header {
   padding: 12px 20px;
@@ -122,7 +132,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   background: #1e2636;
-  border-bottom: 1px solid rgba(100,116,139,0.18);
+  border-bottom: 1px solid rgba(100, 116, 139, 0.18);
 }
 .header-controls {
   display: flex;
@@ -156,7 +166,7 @@ onUnmounted(() => {
 }
 .output-line {
   margin-bottom: 5px;
-  white-space: normal;  /* 关键：让它自动换行，忽略多余的换行 */
+  white-space: normal; /* 关键：让它自动换行，忽略多余的换行 */
   word-break: break-all;
 }
 .loading-indicator {

@@ -1,4 +1,3 @@
-import { timePickerDefaultProps } from 'element-plus'
 import { defineStore } from 'pinia'
 import { useConfigStore } from './config'
 // 后端基础地址
@@ -49,24 +48,28 @@ export const useTaskStore = defineStore('task', {
      * 返回示例：Task[]，包含 startTime
      */
     safeGetById(id: string): Task {
-      const task = this.tasks.find(t => t.id === id)
+      const task = this.tasks.find((t) => t.id === id)
 
       // 提供安全默认值
-      return task || {
-        id: '',
-        startTime: '',
-        name: '',
-        target: '',
-        command: '',
-        status: 'pending',
-        results: []
-      }
+      return (
+        task || {
+          id: '',
+          startTime: '',
+          name: '',
+          target: '',
+          command: '',
+          status: 'pending',
+          results: [],
+        }
+      )
     },
     async fetchTasks() {
       try {
         console.log('Fetching tasks from backend...')
         const configStore = useConfigStore()
-        var API_BASE = configStore.getServerUrl ? configStore.getServerUrl : 'http://127.0.0.1:8000' // 获取服务器地址
+        var API_BASE = configStore.getDataServerUrl
+          ? configStore.getDataServerUrl
+          : 'http://127.0.0.1:8000' // 获取服务器地址
         console.log('API_BASE:', API_BASE)
         const response = await fetch(`${API_BASE}/tasks`)
         const data = await response.json()
@@ -85,7 +88,7 @@ export const useTaskStore = defineStore('task', {
     async addTask(task: Omit<Task, 'id' | 'results' | 'startTime'>) {
       try {
         const configStore = useConfigStore()
-        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+        const API_BASE = configStore.getDataServerUrl ?? 'http://127.0.0.1:8000'
 
         console.log('Adding task:', task)
         const response = await fetch(`${API_BASE}/tasks`, {
@@ -115,7 +118,7 @@ export const useTaskStore = defineStore('task', {
     async updateTask(id: string, updates: Partial<Task>) {
       try {
         const configStore = useConfigStore()
-        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+        const API_BASE = configStore.getDataServerUrl ?? 'http://127.0.0.1:8000'
 
         const response = await fetch(`${API_BASE}/tasks/${id}`, {
           method: 'PUT',
@@ -143,7 +146,7 @@ export const useTaskStore = defineStore('task', {
     async removeTask(id: string) {
       try {
         const configStore = useConfigStore()
-        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+        const API_BASE = configStore.getDataServerUrl ?? 'http://127.0.0.1:8000'
 
         const response = await fetch(`${API_BASE}/tasks/${id}`, {
           method: 'DELETE',
@@ -178,7 +181,7 @@ export const useTaskStore = defineStore('task', {
     async startTask(id: string) {
       try {
         const configStore = useConfigStore()
-        const API_BASE = configStore.getServerUrl ?? 'http://127.0.0.1:8000'
+        const API_BASE = configStore.getDataServerUrl ?? 'http://127.0.0.1:8000'
 
         const response = await fetch(`${API_BASE}/tasks/${id}/start`, {
           method: 'POST',

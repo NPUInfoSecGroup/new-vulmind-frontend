@@ -30,9 +30,15 @@
                 <el-input v-model="api_key" placeholder="请输入模型名称" size="large"></el-input>
               </el-collapse-item>
               <el-collapse-item title="服务器配置" name="2">
-                <p>服务器地址</p>
+                <p>MCP服务器地址</p>
                 <el-input
-                  v-model="serve_url"
+                  v-model="mcp_serve_url"
+                  placeholder="请输入服务器地址"
+                  size="large"
+                ></el-input>
+                <p>数据服务器地址</p>
+                <el-input
+                  v-model="data_serve_url"
                   placeholder="请输入服务器地址"
                   size="large"
                 ></el-input>
@@ -67,7 +73,8 @@ const options = ref([
 
 const value = ref(configStore.getLLMConfig.modelProvider)
 const base_url = ref(configStore.getLLMConfig.APIBaseUrl)
-const serve_url = ref(configStore.getServerUrl)
+const mcp_serve_url = ref(configStore.getMCPServerUrl)
+const data_serve_url = ref(configStore.getDataServerUrl)
 const api_key = ref(configStore.getLLMConfig.APIKey)
 function saveConfig() {
   configStore.updateLLMConfig({
@@ -75,7 +82,8 @@ function saveConfig() {
     APIBaseUrl: base_url.value,
     APIKey: api_key.value,
   })
-  configStore.updateServerUrl(serve_url.value)
+  configStore.updateMCPServerUrl(mcp_serve_url.value)
+  configStore.updateDataServerUrl(data_serve_url.value)
 }
 </script>
 

@@ -2,7 +2,9 @@ import { defineStore } from 'pinia'
 
 export interface ServeConfig {
   /** 服务器地址 */
-  serverUrl: string
+  dataServerUrl: string
+  /** MCP 服务器地址 */
+  mcpServerUrl: string
 }
 
 export interface LLMConfig {
@@ -23,7 +25,8 @@ export interface LLMConfig {
 export const useConfigStore = defineStore('config', {
   state: () => ({
     serveConfig: {
-      serverUrl: 'http://localhost:9000', // 默认服务器地址
+      mcpServerUrl: 'http://localhost:8000', // 默认服务器地址
+      dataServerUrl: 'http://localhost:9000', // 默认数据服务器地址
     } as ServeConfig,
     llmConfig: {
       modelProvider: 'deepseek', // 默认模型提供商
@@ -36,14 +39,18 @@ export const useConfigStore = defineStore('config', {
   }),
   getters: {
     // 获取服务器地址
-    getServerUrl: (state) => state.serveConfig.serverUrl,
+    getMCPServerUrl: (state) => state.serveConfig.mcpServerUrl,
+    getDataServerUrl: (state) => state.serveConfig.dataServerUrl,
     // 获取 LLM 配置
     getLLMConfig: (state) => state.llmConfig,
   },
   actions: {
     // 更新服务器地址
-    updateServerUrl(url: string) {
-      this.serveConfig.serverUrl = url
+    updateDataServerUrl(url: string) {
+      this.serveConfig.dataServerUrl = url
+    },
+    updateMCPServerUrl(url: string) {
+      this.serveConfig.mcpServerUrl = url
     },
     // 更新 LLM 配置
     updateLLMConfig(config: Partial<LLMConfig>) {
