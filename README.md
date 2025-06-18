@@ -33,3 +33,7 @@ npm run build
 运行app.py后端地址可以填写在用户配置上进行连接。
 
 ![alt text](assets/image.png)
+
+运行app.py后端地址可以填写在数据服务器上进行连接。
+
+运行main.py后端地址可以填写在MCP配置上进行连接。（仅为模拟，具体后端可查看相关项目）
