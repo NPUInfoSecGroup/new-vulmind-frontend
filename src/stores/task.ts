@@ -48,6 +48,20 @@ export const useTaskStore = defineStore('task', {
      * 后端接口：GET /tasks
      * 返回示例：Task[]，包含 startTime
      */
+    safeGetById(id: string): Task {
+      const task = this.tasks.find(t => t.id === id)
+
+      // 提供安全默认值
+      return task || {
+        id: '',
+        startTime: '',
+        name: '',
+        target: '',
+        command: '',
+        status: 'pending',
+        results: []
+      }
+    },
     async fetchTasks() {
       try {
         console.log('Fetching tasks from backend...')
