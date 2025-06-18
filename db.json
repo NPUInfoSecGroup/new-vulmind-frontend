@@ -1,6 +1,116 @@
 {
   "tasks": [
     {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "name": "电商平台-用户信息泄露",
+      "target": "https://shop.example.com/api",
+      "command": "scan --deep --auth admin:securePass123",
+      "status": "completed",
+      "startTime": "2025-06-10T09:15:00Z",
+      "results": [
+        {
+          "resultId": "r-bc8f21e9",
+          "severity": "critical",
+          "vulnType": "IDOR",
+          "details": "通过修改用户ID参数可访问他人订单信息，需增加权限验证"
+        },
+        {
+          "resultId": "r-4d8c1a32",
+          "severity": "high",
+          "vulnType": "JWT Token Leak",
+          "details": "认证令牌未设置HttpOnly属性，易被XSS窃取"
+        }
+      ]
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "银行系统-关键漏洞扫描",
+      "target": "https://onlinebank.example.net",
+      "command": "scan --full --timeout 300",
+      "status": "completed",
+      "startTime": "2025-06-12T14:20:00Z",
+      "results": [
+        {
+          "resultId": "r-7e3b9f11",
+          "severity": "critical",
+          "vulnType": "CSRF",
+          "details": "转账操作未验证CSRF令牌，可构造恶意页面发起攻击"
+        },
+        {
+          "resultId": "r-2a6c4d88",
+          "severity": "medium",
+          "vulnType": "Clickjacking",
+          "details": "缺少X-Frame-Options头，存在界面伪装风险"
+        }
+      ]
+    },
+    {
+      "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "name": "医疗系统-患者数据审计",
+      "target": "https://clinic.example.org/records",
+      "command": "scan --sensitive --headers AuthToken:xyz789",
+      "status": "completed",
+      "startTime": "2025-06-14T11:05:00Z",
+      "results": [
+        {
+          "resultId": "r-f93a7c15",
+          "severity": "high",
+          "vulnType": "Insecure Direct Object Reference",
+          "details": "病历ID可遍历查询(1-10000)，无需认证获取敏感数据"
+        },
+        {
+          "resultId": "r-8b1e204d",
+          "severity": "critical",
+          "vulnType": "SQL Injection",
+          "details": "患者搜索接口存在时间盲注漏洞，注入参数: patientName"
+        }
+      ]
+    },
+    {
+      "id": "6ba7b811-9dad-11d1-80b4-00c04fd430c9",
+      "name": "API网关-认证绕过",
+      "target": "https://api-gateway.example.io/v3",
+      "command": "scan --rate-limit 50",
+      "status": "completed",
+      "startTime": "2025-06-16T16:45:00Z",
+      "results": [
+        {
+          "resultId": "r-6c82a9bf",
+          "severity": "critical",
+          "vulnType": "Authentication Bypass",
+          "details": "删除Authorization头后仍可访问/admin接口"
+        },
+        {
+          "resultId": "r-d41e9f03",
+          "severity": "medium",
+          "vulnType": "Mass Assignment",
+          "details": "PUT /users 接受is_admin参数，普通用户可提权"
+        }
+      ]
+    },
+    {
+      "id": "6ba7b812-9dad-11d1-80b4-00c04fd430ca",
+      "name": "工控系统-Modbus协议检测",
+      "target": "modbus://192.168.2.10:502",
+      "command": "scan --protocol modbus",
+      "status": "completed",
+      "startTime": "2025-06-18T13:30:00Z",
+      "results": [
+        {
+          "resultId": "r-9e3fbc77",
+          "severity": "critical",
+          "vulnType": "Unprotected Access",
+          "details": "未启用身份验证，攻击者可直接修改PLC寄存器值"
+        },
+        {
+          "resultId": "r-5a7f31ec",
+          "severity": "high",
+          "vulnType": "Denial of Service",
+          "details": "恶意构造Function Code 0x08可致设备宕机"
+        }
+      ]
+    },
+    {
       "id": "a1f4b9d3-8c1f-4c32-98a2-9f3e6f0c0e2b",
       "name": "示例任务 - 完成有高危漏洞",
       "target": "http://example.com",
@@ -100,6 +210,106 @@
     }
   ],
   "conversations": [
+    {
+      "taskId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "messages": [
+        {
+          "role": "user",
+          "content": "深度扫描电商平台API，使用admin凭证",
+          "timestamp": "2025-06-10T09:15:01Z"
+        },
+        {
+          "role": "assistant",
+          "content": "开始深度扫描电商API，预计耗时8分钟",
+          "timestamp": "2025-06-10T09:15:03Z"
+        },
+        {
+          "role": "system",
+          "content": "检测到2个高危漏洞，已生成详细报告",
+          "timestamp": "2025-06-10T09:23:45Z"
+        }
+      ]
+    },
+    {
+      "taskId": "550e8400-e29b-41d4-a716-446655440000",
+      "messages": [
+        {
+          "role": "user",
+          "content": "执行银行系统全量扫描，重点检查支付接口",
+          "timestamp": "2025-06-12T14:20:05Z"
+        },
+        {
+          "role": "assistant",
+          "content": "金融系统扫描启动，启用严格检测策略",
+          "timestamp": "2025-06-12T14:20:08Z"
+        },
+        {
+          "role": "system",
+          "content": "发现CSRF和界面伪装漏洞，已标记为关键风险",
+          "timestamp": "2025-06-12T14:45:30Z"
+        }
+      ]
+    },
+    {
+      "taskId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "messages": [
+        {
+          "role": "user",
+          "content": "扫描医疗系统患者数据接口，特别注意HIPAA合规",
+          "timestamp": "2025-06-14T11:05:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "启用敏感数据检测模块，开始病历系统扫描",
+          "timestamp": "2025-06-14T11:05:06Z"
+        },
+        {
+          "role": "system",
+          "content": "发现IDOR和SQL注入漏洞，患者隐私存在重大风险",
+          "timestamp": "2025-06-14T11:35:20Z"
+        }
+      ]
+    },
+    {
+      "taskId": "6ba7b811-9dad-11d1-80b4-00c04fd430c9",
+      "messages": [
+        {
+          "role": "user",
+          "content": "测试API网关安全机制，尝试认证绕过",
+          "timestamp": "2025-06-16T16:45:01Z"
+        },
+        {
+          "role": "assistant",
+          "content": "执行API端点模糊测试，重点检测授权逻辑",
+          "timestamp": "2025-06-16T16:45:04Z"
+        },
+        {
+          "role": "system",
+          "content": "成功绕过admin接口认证，发现权限提升漏洞",
+          "timestamp": "2025-06-16T17:05:15Z"
+        }
+      ]
+    },
+    {
+      "taskId": "6ba7b812-9dad-11d1-80b4-00c04fd430ca",
+      "messages": [
+        {
+          "role": "user",
+          "content": "扫描工业控制设备Modbus端口",
+          "timestamp": "2025-06-18T13:30:02Z"
+        },
+        {
+          "role": "assistant",
+          "content": "启动工控协议专用扫描器，检测PLC设备",
+          "timestamp": "2025-06-18T13:30:05Z"
+        },
+        {
+          "role": "system",
+          "content": "PLC存在未授权访问和拒绝服务漏洞，需紧急修复",
+          "timestamp": "2025-06-18T13:48:40Z"
+        }
+      ]
+    },
     {
       "taskId": "a1f4b9d3-8c1f-4c32-98a2-9f3e6f0c0e2b",
       "messages": [
