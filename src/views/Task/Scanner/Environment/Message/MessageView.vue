@@ -71,9 +71,10 @@ async function startAgent() {
   try {
     // 1. 启动 agent 模式
     console.log('正在启动 Agent 模式...')
-    await axios.post('http://localhost:8000/agent/' + task.id + '/start', {
+    await axios.post('http://localhost:8000/agent/start', {
       target: config.target,
       goal: config.goal,
+      id: task.id,
       iteration_limit: 20,
     })
     agentStarted.value = true
