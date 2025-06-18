@@ -69,7 +69,7 @@
     <!-- 操作按钮 -->
     <div class="actions">
       <el-button type="" class="no" size="large" @click="cancel"> 取消 </el-button>
-      <el-button type="primary" class="yes" size="large" @click="startScan"> 启动扫描 </el-button>
+      <el-button type="primary" class="yes" size="large" @click="startScan"> 创建任务 </el-button>
     </div>
   </div>
 </template>
