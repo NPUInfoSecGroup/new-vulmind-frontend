@@ -109,32 +109,45 @@
             </div>
 
             <div class="vuln-summary">
-              <div class="vuln-item critical" v-if="vulnSummary(row).critical > 0">
+              <div
+                class="vuln-item critical"
+                v-if="vulnSummary(row).critical > 0 && row.status !== 'failed'"
+              >
                 <span class="vuln-label">严重</span>
                 <span class="vuln-count">{{ vulnSummary(row).critical }}</span>
               </div>
-              <div class="vuln-item high" v-if="vulnSummary(row).high > 0">
+              <div
+                class="vuln-item high"
+                v-if="vulnSummary(row).high > 0 && row.status !== 'failed'"
+              >
                 <span class="vuln-label">高危</span>
                 <span class="vuln-count">{{ vulnSummary(row).high }}</span>
               </div>
-              <div class="vuln-item medium" v-if="vulnSummary(row).medium > 0">
+              <div
+                class="vuln-item medium"
+                v-if="vulnSummary(row).medium > 0 && row.status !== 'failed'"
+              >
                 <span class="vuln-label">中危</span>
                 <span class="vuln-count">{{ vulnSummary(row).medium }}</span>
               </div>
-              <div class="vuln-item low" v-if="vulnSummary(row).low > 0">
+              <div class="vuln-item low" v-if="vulnSummary(row).low > 0 && row.status !== 'failed'">
                 <span class="vuln-label">低危</span>
                 <span class="vuln-count">{{ vulnSummary(row).low }}</span>
               </div>
               <div
-                class="vuln-item safe"
+                class="vuln-item low"
                 v-if="
                   vulnSummary(row).low === 0 &&
                   vulnSummary(row).medium === 0 &&
                   vulnSummary(row).high === 0 &&
-                  vulnSummary(row).critical === 0
+                  vulnSummary(row).critical === 0 &&
+                  row.status !== 'failed'
                 "
               >
-                <span class="vuln-label">无风险</span>
+                <span class="vuln-label">待分析</span>
+              </div>
+              <div class="vuln-item critical" v-if="row.status === 'failed'">
+                <span class="vuln-label">扫描异常</span>
               </div>
             </div>
           </div>
