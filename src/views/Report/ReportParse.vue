@@ -8,7 +8,10 @@
     </header>
 
     <!-- 配置面板 (已包含模板选择和扫描记录选择) -->
-    <div class="template-config-panel" v-if="reportTemplates.length > 0 || loadingTemplates || scansAvailable">
+    <div
+      class="template-config-panel"
+      v-if="reportTemplates.length > 0 || loadingTemplates || scansAvailable"
+    >
       <!-- 模板选择器 -->
       <div class="select-row">
         <div class="select-label">报告模板：</div>
@@ -55,21 +58,14 @@
           <span class="btn-text">保存报告</span>
           <i class="fas fa-cloud-download-alt btn-icon-magic"></i>
         </button>
-
       </div>
-
     </div>
-
 
     <!-- 主聊天区 - 居中显示AI消息 -->
     <div class="chat-panel">
       <div class="messages-container">
         <!-- 只显示 AI 消息 - 移除标题栏并居中 -->
-        <div
-          v-for="(msg, index) in aiMessages"
-          :key="index"
-          class="message ai-message-center"
-        >
+        <div v-for="(msg, index) in aiMessages" :key="index" class="message ai-message-center">
           <div class="message-content" v-html="renderMarkdown(msg.content)"></div>
         </div>
 
@@ -85,108 +81,107 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- 底部状态与控制区 -->
     <div class="control-panel">
       <div class="status-container">
-        <div :class="['status-indicator',
-            apiStatus === 'connecting' ? 'connecting' :
-            apiStatus === 'error' ? 'error' : '']"></div>
+        <div
+          :class="[
+            'status-indicator',
+            apiStatus === 'connecting' ? 'connecting' : apiStatus === 'error' ? 'error' : '',
+          ]"
+        ></div>
         <span>{{ statusText }}</span>
       </div>
-
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, watch, nextTick, computed, onMounted } from 'vue'
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const aiMessages = computed(() => {
-  return messages.value.filter(msg => msg.role === 'assistant');
-});
+  return messages.value.filter((msg) => msg.role === 'assistant')
+})
 
 const hasGeneratedReport = computed(() => {
-  return aiMessages.value.length > 0;
-});
+  return aiMessages.value.length > 0
+})
 
 // 新增: 模板选择相关变量
-const reportTemplates = ref([]);
-const loadingTemplates = ref(false);
-const selectedReportTemplateId = ref(null);
+const reportTemplates = ref([])
+const loadingTemplates = ref(false)
+const selectedReportTemplateId = ref(null)
 
 // 扫描记录相关变量
-const scanHistory = ref([]);
-const loadingScans = ref(false);
-const scansAvailable = ref(false);
-const selectedScanId = ref(null);
-const selectedScan = ref(null);
+const scanHistory = ref([])
+const loadingScans = ref(false)
+const scansAvailable = ref(false)
+const selectedScanId = ref(null)
+const selectedScan = ref(null)
 
-const isGenerating = ref(false);
+const isGenerating = ref(false)
 const loadReportTemplates = async () => {
   try {
-    loadingTemplates.value = true;
+    loadingTemplates.value = true
 
     // 使用 Vite 的 glob 导入功能从 scan-template 目录加载模板
-    const modules = import.meta.glob('/src/scan-template/*.json', { eager: true });
+    const modules = import.meta.glob('/src/scan-template/*.json', { eager: true })
 
     // 提取模板数据 - 包含id, name和preview字段
     const templates = Object.values(modules)
       .map((module) => {
-        const { id, name, preview } = module.default || {};
-        return { id, name, preview };
+        const { id, name, preview } = module.default || {}
+        return { id, name, preview }
       })
-      .filter(tpl => tpl.id && tpl.name && tpl.preview);  // 确保有preview字段
+      .filter((tpl) => tpl.id && tpl.name && tpl.preview) // 确保有preview字段
 
     // 按创建日期排序，最新的在前
-    templates.sort((a, b) => b.id.localeCompare(a.id));
+    templates.sort((a, b) => b.id.localeCompare(a.id))
 
-    reportTemplates.value = templates;
+    reportTemplates.value = templates
 
     // 设置默认选中第一个模板
     if (templates.length > 0) {
-      selectedReportTemplateId.value = templates[0].id;
+      selectedReportTemplateId.value = templates[0].id
     }
-
   } catch (e) {
-    console.error('加载报告模板失败:', e);
+    console.error('加载报告模板失败:', e)
   } finally {
-    loadingTemplates.value = false;
+    loadingTemplates.value = false
   }
-};
+}
 
 const loadScanHistory = async () => {
   try {
-    loadingScans.value = true;
+    loadingScans.value = true
 
     // 从API获取扫描记录
-    const response = await fetch('http://127.0.0.1:9000/tasks');
+    const response = await fetch('http://127.0.0.1:9000/tasks')
 
     if (!response.ok) {
-      throw new Error(`HTTP错误! 状态码: ${response.status}`);
+      throw new Error(`HTTP错误! 状态码: ${response.status}`)
     }
 
-    const data = await response.json();
-    scanHistory.value = data.tasks || [];
-    scansAvailable.value = scanHistory.value.length > 0;
+    const data = await response.json()
+    scanHistory.value = data.tasks || []
+    scansAvailable.value = scanHistory.value.length > 0
 
     // 设置默认选中第一条记录
     if (scanHistory.value.length > 0) {
-      selectedScanId.value = scanHistory.value[0].id;
-      handleScanSelection();
+      selectedScanId.value = scanHistory.value[0].id
+      handleScanSelection()
     }
   } catch (e) {
-    console.error('加载扫描记录失败:', e);
-    scansAvailable.value = false;
+    console.error('加载扫描记录失败:', e)
+    scansAvailable.value = false
   } finally {
-    loadingScans.value = false;
+    loadingScans.value = false
   }
-};
+}
 
 const formatScanOption = (scan) => {
   const scanTypeLabels = {
@@ -194,44 +189,42 @@ const formatScanOption = (scan) => {
     'scan --fast': '快速扫描',
     'scan --full': '全面扫描',
     'scan --auth': '认证扫描',
-    'scan': '基础扫描'
-  };
+    scan: '基础扫描',
+  }
 
-  const scanType = scanTypeLabels[scan.command] || '未知扫描';
-  return `${scan.name} (${scanType})`;
-};
+  const scanType = scanTypeLabels[scan.command] || '未知扫描'
+  return `${scan.name} (${scanType})`
+}
 
 const handleScanSelection = () => {
   // 查找选中的扫描记录
-  selectedScan.value = scanHistory.value.find(
-    scan => scan.id === selectedScanId.value
-  ) || null;
-};
+  selectedScan.value = scanHistory.value.find((scan) => scan.id === selectedScanId.value) || null
+}
 
 const generateReport = async () => {
   if (!selectedReportTemplateId.value || !selectedScanId.value) {
-    alert('请选择模板和扫描记录');
-    return;
+    alert('请选择模板和扫描记录')
+    return
   }
 
   // 设置生成状态
-  isGenerating.value = true;
+  isGenerating.value = true
 
   try {
     // 查找选中的模板
     const selectedTemplate = reportTemplates.value.find(
-      t => t.id === selectedReportTemplateId.value
-    );
+      (t) => t.id === selectedReportTemplateId.value,
+    )
 
     if (!selectedTemplate) {
-      alert('选择的模板不存在');
-      return;
+      alert('选择的模板不存在')
+      return
     }
 
     // 检查preview字段是否存在
     if (!selectedTemplate.preview) {
-      alert('模板缺少预览内容');
-      return;
+      alert('模板缺少预览内容')
+      return
     }
 
     // 构建prompt - 直接使用preview字段
@@ -246,119 +239,118 @@ const generateReport = async () => {
 
   扫描结果数据如下：
   ${JSON.stringify(selectedScan.value, null, 2)}
-  `;
+  `
 
-    messages.value.push({ role: 'user', content: prompt });
+    messages.value.push({ role: 'user', content: prompt })
 
     // 调用API生成报告
-    isLoading.value = true;
-    isTyping.value = true;
-    apiStatus.value = 'connecting';
+    isLoading.value = true
+    isTyping.value = true
+    apiStatus.value = 'connecting'
 
     try {
       // 调用DeepSeek API
-      const response = await callDeepSeekAPI(prompt);
+      const response = await callDeepSeekAPI(prompt)
 
       // 添加AI响应
-      messages.value.push({ role: 'assistant', content: response });
-      apiStatus.value = 'connected';
+      messages.value.push({ role: 'assistant', content: response })
+      apiStatus.value = 'connected'
     } catch (error) {
-      console.error('API请求错误:', error);
+      console.error('API请求错误:', error)
       messages.value.push({
         role: 'assistant',
-        content: `抱歉，生成报告时出错: ${error.message}`
-      });
-      apiStatus.value = 'error';
+        content: `抱歉，生成报告时出错: ${error.message}`,
+      })
+      apiStatus.value = 'error'
     } finally {
-      isLoading.value = false;
-      isTyping.value = false;
+      isLoading.value = false
+      isTyping.value = false
     }
-
   } catch (e) {
-    console.error('生成报告出错:', e);
-    alert('生成报告时发生错误');
+    console.error('生成报告出错:', e)
+    alert('生成报告时发生错误')
   } finally {
-    isGenerating.value = false;
+    isGenerating.value = false
   }
-};
+}
 //保存报告功能
 const saveReport = () => {
   if (!hasGeneratedReport.value) {
-    alert('请先生成报告');
-    return;
+    alert('请先生成报告')
+    return
   }
 
   if (!selectedScan.value || !selectedScan.value.name) {
-    alert('未选择扫描记录，无法确定文件名');
-    return;
+    alert('未选择扫描记录，无法确定文件名')
+    return
   }
 
   // 获取最新生成的报告内容
-  const reportContent = aiMessages.value[aiMessages.value.length - 1].content;
+  const reportContent = aiMessages.value[aiMessages.value.length - 1].content
 
   // 创建文件内容
-  const blob = new Blob([reportContent], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([reportContent], { type: 'text/markdown' })
+  const url = URL.createObjectURL(blob)
 
   // 创建下载链接
-  const link = document.createElement('a');
-  link.href = url;
+  const link = document.createElement('a')
+  link.href = url
 
   // 改进的文件名生成方式
-  let fileName = selectedScan.value.name.trim();
+  let fileName = selectedScan.value.name.trim()
 
   // 清理文件名 - 保留中文、字母、数字、空格和连接符
-  fileName = fileName.replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s_\-()[\]]/g, ' ')
-    .replace(/\s+/g, ' ')      // 多个空格替换为一个
-    .trim();                  // 清除首尾空格
+  fileName = fileName
+    .replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s_\-()[\]]/g, ' ')
+    .replace(/\s+/g, ' ') // 多个空格替换为一个
+    .trim() // 清除首尾空格
 
   // 如果清理后文件名为空，使用默认文件名
   if (!fileName) {
-    const date = new Date();
-    const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-    fileName = `安全报告_${dateStr}`;
+    const date = new Date()
+    const dateStr = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`
+    fileName = `安全报告_${dateStr}`
   }
 
   // 确保以.md结尾
   if (!fileName.endsWith('.md')) {
-    fileName += '.md';
+    fileName += '.md'
   }
 
-  link.download = fileName;
+  link.download = fileName
 
   // 触发下载
-  document.body.appendChild(link);
-  link.click();
+  document.body.appendChild(link)
+  link.click()
 
   // 清理
   setTimeout(() => {
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }, 100);
-};
-
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }, 100)
+}
 
 onMounted(() => {
-  loadReportTemplates();
-  loadScanHistory();
-});
+  loadReportTemplates()
+  loadScanHistory()
+})
 
 const renderMarkdown = (markdown) => {
-  if (!markdown) return '';
+  if (!markdown) return ''
 
   // 配置marked
   marked.setOptions({
     gfm: true,
     breaks: true,
     highlight: (code, lang) => {
-      const language = lang || 'plaintext';
-      return `<pre><code class="hljs language-${language}">${escapeHtml(code)}</code></pre>`;
-    }
-  });
+      const language = lang || 'plaintext'
+      return `<pre><code class="hljs language-${language}">${escapeHtml(code)}</code></pre>`
+    },
+  })
 
-  const rawHtml = marked.parse(markdown);
-  return DOMPurify.sanitize(rawHtml);
-};
+  const rawHtml = marked.parse(markdown)
+  return DOMPurify.sanitize(rawHtml)
+}
 
 // 增强的HTML转义函数，确保代码块内容安全
 const escapeHtml = (str) => {
@@ -367,70 +359,74 @@ const escapeHtml = (str) => {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-};
+    .replace(/'/g, '&#039;')
+}
 const scrollToBottom = () => {
   nextTick(() => {
-    const container = document.querySelector('.messages-container');
+    const container = document.querySelector('.messages-container')
     if (container) {
-      container.scrollTop = container.scrollHeight;
+      container.scrollTop = container.scrollHeight
     }
-  });
-};
+  })
+}
 
 // 对话数据
-const messages = ref([]);
-const isLoading = ref(false);
-const isTyping = ref(false);
-const apiStatus = ref('connected'); // connected, connecting, error
+const messages = ref([])
+const isLoading = ref(false)
+const isTyping = ref(false)
+const apiStatus = ref('connected') // connected, connecting, error
 
 // 状态文本
 const statusText = computed(() => {
   return {
     connected: 'API连接正常',
     connecting: '正在连接API...',
-    error: 'API连接错误'
-  }[apiStatus.value];
-});
+    error: 'API连接错误',
+  }[apiStatus.value]
+})
 
+import { useConfigStore } from '@/stores/config'
 
-
+const configStore = useConfigStore()
+const apiKey = ref(configStore.llmConfig.APIKey)
+const apiUrl = ref(configStore.llmConfig.APIBaseUrl)
+// 检查API密钥是否存在
+if (!apiKey.value) {
+  console.error('API密钥为空:', apiKey.value)
+  alert('API密钥未配置，请在配置中设置')
+}
 
 // DeepSeek API调用
 const callDeepSeekAPI = async (inputText) => {
-  const apiUrl = 'https://api.deepseek.com/v1/chat/completions';
-  const apiKey = 'sk-cc8300aca20d492f8d4726bf1510bb84';
-
-  const response = await fetch(apiUrl, {
+  // 一定要用 .value 取出 ref 里的真实字符串
+  const response = await fetch(apiUrl.value, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      Authorization: `Bearer ${apiKey.value}`,
     },
     body: JSON.stringify({
-      model: "deepseek-chat",
-      messages: [
-        ...messages.value,
-        { role: "user", content: inputText }
-      ],
+      model: 'deepseek-chat',
+      messages: [...messages.value, { role: 'user', content: inputText }],
       temperature: 0.7,
       max_tokens: 2000,
-      stream: false
-    })
-  });
-
+      stream: false,
+    }),
+  })
   if (!response.ok) {
-    throw new Error(`API请求失败: ${response.status}`);
+    throw new Error(`API请求失败: ${response.status}`)
   }
+  const data = await response.json()
+  return data.choices[0].message.content
+}
 
-  const data = await response.json();
-  return data.choices[0].message.content;
-};
-
-
-watch(messages, () => {
-  scrollToBottom();
-}, { deep: true, immediate: true });
+watch(
+  messages,
+  () => {
+    scrollToBottom()
+  },
+  { deep: true, immediate: true },
+)
 </script>
 
 <style scoped>
@@ -500,8 +496,14 @@ watch(messages, () => {
 }
 
 @keyframes messageAppear {
-  0% { opacity: 0; transform: translateY(15px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-message {
@@ -580,12 +582,23 @@ watch(messages, () => {
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .input-container {
@@ -759,7 +772,7 @@ textarea:focus {
 }
 
 .message-content :deep(ul) li::marker {
-  content: "•";
+  content: '•';
   color: #4fa3f7;
 }
 
@@ -1070,8 +1083,14 @@ textarea:focus {
 }
 
 @keyframes messageAppear {
-  0% { opacity: 0; transform: translateY(15px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message-header {
@@ -1135,12 +1154,23 @@ textarea:focus {
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .input-container {
@@ -1317,7 +1347,7 @@ textarea:focus {
 }
 
 .message-content :deep(ul) li::marker {
-  content: "•";
+  content: '•';
   color: #4fa3f7;
 }
 
@@ -1615,8 +1645,14 @@ textarea:focus {
 }
 
 @keyframes messageAppear {
-  0% { opacity: 0; transform: translateY(15px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message-content {
@@ -1661,12 +1697,23 @@ textarea:focus {
   animation: pulse 1.5s infinite ease-in-out;
 }
 
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 /* 模板配置面板 */
@@ -1842,7 +1889,7 @@ textarea:focus {
 }
 
 .message-content :deep(ul) li::marker {
-  content: "•";
+  content: '•';
   color: #4fa3f7;
 }
 
@@ -1937,5 +1984,4 @@ textarea:focus {
     padding: 15px;
   }
 }
-
 </style>

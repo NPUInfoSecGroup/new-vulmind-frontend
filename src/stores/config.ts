@@ -33,8 +33,8 @@ export const useConfigStore = defineStore('config', {
       modelName: 'v3', // 默认模型名称
       modelVersion: 'v1', // 默认模型版本
       modelParams: {}, // 模型参数
-      APIKey: 'ds_sk_live_9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c', // API 密钥
-      APIBaseUrl: 'https://api.deepseek.com', // API 基础 URL
+      APIKey: 'sk-cc8300aca20d492f8d4726bf1510bb84', // API 密钥，不用试销毁了
+      APIBaseUrl: 'https://api.deepseek.com/v1/chat/completions', // API 基础 URL
     } as LLMConfig,
   }),
   getters: {
