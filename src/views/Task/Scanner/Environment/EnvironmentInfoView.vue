@@ -211,6 +211,7 @@ h2 {
 .terminal {
   border-radius: 1rem;
   box-shadow: var(--box-shadow);
+  background: #192034;
 }
 span.scanner-name {
   display: -webkit-box;
