@@ -18,31 +18,9 @@ mock_lines = [
     {"type": "stdout", "content": "扫描开始..."},
     {"type": "instruction", "content": "执行 nmap -sV 127.0.0.1"},
     {
-        "type": "structure",
+        "type": "1",
         "content": '{"host": "127.0.0.1", "open_ports": [22, 80, 443]}',
     },
-    {"type": "stdout", "content": "扫描结束，结果保存在 output.json"},
-    {"type": "stdout", "content": "扫描开始..."},
-    {"type": "instruction", "content": "执行 nmap -sV 127.0.0.1"},
-    {
-        "type": "structure",
-        "content": '{"host": "127.0.0.1", "open_ports": [22, 80, 443]}',
-    },
-    {"type": "stdout", "content": "扫描结束，结果保存在 output.json"},
-    {"type": "stdout", "content": "扫描开始..."},
-    {"type": "instruction", "content": "执行 nmap -sV 127.0.0.1"},
-    {
-        "type": "structure",
-        "content": '{"host": "127.0.0.1", "open_ports": [22, 80, 443]}',
-    },
-    {"type": "stdout", "content": "扫描结束，结果保存在 output.json"},
-    {"type": "stdout", "content": "扫描开始..."},
-    {"type": "instruction", "content": "执行 nmap -sV 127.0.0.1"},
-    {
-        "type": "structure",
-        "content": '{"host": "127.0.0.1", "open_ports": [22, 80, 443]}',
-    },
-    {"type": "stdout", "content": "扫描结束，结果保存在 output.json"},
 ]
 
 

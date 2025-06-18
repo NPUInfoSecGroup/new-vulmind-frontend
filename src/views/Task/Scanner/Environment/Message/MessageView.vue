@@ -13,8 +13,15 @@
 <script lang="ts" setup>
 import MarkdownIt from 'markdown-it'
 import { useConfigStore } from '@/stores/config'
+import { useTaskStore } from '@/stores/task'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const configStore = useConfigStore()
+const taskStore = useTaskStore()
+const taskID = route.params.taskID as string
+const task = taskStore.safeGetById(taskID)
 const baseUrl = configStore.getServerUrl
 
 const md = new MarkdownIt()
@@ -27,8 +34,8 @@ import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import axios from 'axios'
 
 const config = reactive({
-  target: '',
-  goal: '',
+  target: task.target,
+  goal: task.command,
 })
 const agentStarted = ref(false)
 const agentRunning = ref(false)
@@ -63,6 +70,7 @@ async function startAgent() {
   initLoading.value = true
   try {
     // 1. 启动 agent 模式
+    console.log('正在启动 Agent 模式...')
     await axios.post('http://localhost:8000/agent/start', {
       target: config.target,
       goal: config.goal,
@@ -70,20 +78,33 @@ async function startAgent() {
     })
     agentStarted.value = true
     agentRunning.value = true
-    messages.value.push({ role: 'system', content: '➡️ Agent 模式已启动，正在自动进行渗透测试...' })
+    // messages.value.push({ role: 'system', content: '➡️ Agent 模式已启动，正在自动进行渗透测试...' })
     await nextTick()
     scrollbarRef.value?.setScrollTop(999999)
     // 2. 开始自动轮询/拉取 agent 步骤直到结束
+    console.log('开始轮询 Agent 步骤...')
     pollAgentSteps()
   } catch (err) {
-    messages.value.push({ role: 'system', content: '❌ 启动失败，请检查后端' })
+    messages.value.push({ role: 'system', content: '# 启动失败，请检查后端' })
     agentStarted.value = false
     agentRunning.value = false
   }
   initLoading.value = false
 }
+import { eventBus } from '../event-bus'
+import { onBeforeUnmount } from 'vue'
+import { routeLocationKey } from 'vue-router'
+
+onMounted(() => {
+  eventBus.on('startAgent', startAgent)
+})
+
+onBeforeUnmount(() => {
+  eventBus.off('startAgent', startAgent)
+})
 
 async function pollAgentSteps() {
+  console.log('轮询 Agent 步骤...')
   if (!agentRunning.value) return
 
   try {
@@ -102,7 +123,7 @@ async function pollAgentSteps() {
     // 检查Agent状态，决定是否继续
     const statusResp = await axios.get('http://localhost:8000/agent/status')
     if (statusResp.data.running === false) {
-      messages.value.push({ role: 'system', content: '✅ Agent 已完成全部渗透任务！' })
+      // messages.value.push({ role: 'system', content: '✅ Agent 已完成全部渗透任务！' })
       agentRunning.value = false
       agentStarted.value = false
       return
@@ -112,7 +133,7 @@ async function pollAgentSteps() {
     await nextTick()
     scrollbarRef.value?.setScrollTop(999999)
   } catch (err) {
-    messages.value.push({ role: 'system', content: '❌ Agent 步骤执行失败或中断！' })
+    messages.value.push({ role: 'system', content: '# Agent 步骤执行失败或中断！' })
     agentRunning.value = false
     agentStarted.value = false
   }

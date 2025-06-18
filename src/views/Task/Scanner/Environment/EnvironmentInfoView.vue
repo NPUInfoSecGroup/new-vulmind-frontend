@@ -9,12 +9,7 @@
             <span class="command">{{ task && task.command }}</span>
           </div>
           <div class="action">
-            <el-button
-              type="primary"
-              @click="start"
-              v-if="task?.status == 'pending'">
-              执行任务
-            </el-button>
+            <el-button type="primary" @click="start"> 执行任务 </el-button>
           </div>
         </div>
         <div class="terminal">
@@ -28,7 +23,6 @@
     </el-container>
   </div>
 </template>
-
 
 <script lang="ts" setup>
 import type { Task } from '@/stores/task'
@@ -55,10 +49,7 @@ const startStatusPolling = () => {
   const isFinished = task.value?.status === 'completed' || task.value?.status === 'failed'
 
   // 确保任务存在且状态允许轮询
-  const shouldStart =
-    task.value?.id &&
-    !isPolling.value &&
-    !isFinished
+  const shouldStart = task.value?.id && !isPolling.value && !isFinished
 
   if (!shouldStart) return
 
@@ -73,7 +64,8 @@ const startStatusPolling = () => {
       task.value = updatedTask
 
       // 检查任务是否结束
-      const updatedIsFinished = task.value?.status === 'completed' || task.value?.status === 'failed'
+      const updatedIsFinished =
+        task.value?.status === 'completed' || task.value?.status === 'failed'
 
       if (updatedIsFinished) {
         stopStatusPolling()
@@ -93,6 +85,7 @@ const stopStatusPolling = () => {
   }
   isPolling.value = false
 }
+import { eventBus } from './event-bus'
 
 // 启动任务
 async function start() {
@@ -100,6 +93,7 @@ async function start() {
 
   try {
     await taskStore.startTask(taskID)
+    eventBus.emit('startAgent')
     startStatusPolling()
   } catch (error) {
     console.error('启动任务失败:', error)
@@ -134,7 +128,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 
