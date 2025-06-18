@@ -71,8 +71,8 @@
       "name": "API网关-认证绕过",
       "target": "https://api-gateway.example.io/v3",
       "command": "scan --rate-limit 50",
-      "status": "completed",
-      "startTime": "2025-06-16T16:45:00Z",
+      "status": "running",
+      "startTime": "2025-06-18T19:35:26.302939+00:00",
       "results": [
         {
           "resultId": "r-6c82a9bf",
